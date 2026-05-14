@@ -1,0 +1,457 @@
+openapi: 3.0.3
+info:
+  title: API Documentation
+  version: 1.0.0
+  description: |
+    Auto-generated API documentation
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /metrics:
+    get:
+      summary: Get system metrics
+      operationId: getMetrics
+      tags:
+        - Metrics
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metrics'
+
+  /api/agents:
+    get:
+      summary: List all agents
+      operationId: listAgents
+      tags:
+        - Agents
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: service
+          in: query
+          schema:
+            type: string
+          description: Filter by service name
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [online, offline, error]
+          description: Filter by status
+      responses:
+        '200':
+          description: List of agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Agent'
+                  total:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      summary: Register a new agent
+      operationId: registerAgent
+      tags:
+        - Agents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterAgentRequest'
+      responses:
+        '201':
+          description: Agent registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+
+  /api/agents/{agentId}:
+    get:
+      summary: Get agent details
+      operationId: getAgent
+      tags:
+        - Agents
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Agent details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Remove agent
+      operationId: removeAgent
+      tags:
+        - Agents
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Agent removed
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/agents/{agentId}/logs:
+    get:
+      summary: Search agent logs
+      operationId: searchAgentLogs
+      tags:
+        - Logs
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: keyword
+          in: query
+          schema:
+            type: string
+          description: Search keyword
+        - name: log_dir
+          in: query
+          schema:
+            type: string
+          description: Log directory to search
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+          description: Max results
+      responses:
+        '200':
+          description: Log search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogSearchResult'
+
+  /api/search:
+    post:
+      summary: Search logs across all agents
+      operationId: searchLogs
+      tags:
+        - Logs
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogSearchRequest'
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiAgentLogSearchResp'
+
+  /api/alert:
+    post:
+      summary: Send alert notification
+      operationId: sendAlert
+      tags:
+        - Alerts
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertRequest'
+      responses:
+        '200':
+          description: Alert sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token authentication
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key authentication
+
+  schemas:
+    Agent:
+      type: object
+      properties:
+        name:
+          type: string
+          example: agent-01
+        url:
+          type: string
+          example: http://localhost:9090
+        service:
+          type: string
+          example: api-gateway
+        status:
+          type: string
+          enum: [online, offline, error]
+        lastSeen:
+          type: string
+          format: date-time
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+
+    RegisterAgentRequest:
+      type: object
+      required:
+        - name
+        - url
+      properties:
+        name:
+          type: string
+          example: agent-02
+        url:
+          type: string
+          example: http://localhost:9091
+        service:
+          type: string
+          example: user-service
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+
+    Metrics:
+      type: object
+      properties:
+        cpu:
+          $ref: '#/components/schemas/MetricValues'
+        memory:
+          $ref: '#/components/schemas/MetricValues'
+        disk:
+          $ref: '#/components/schemas/MetricValues'
+        timestamp:
+          type: string
+          format: date-time
+
+    MetricValues:
+      type: object
+      properties:
+        avg:
+          type: number
+          format: float
+          example: 45.5
+        max:
+          type: number
+          format: float
+          example: 85.0
+        min:
+          type: number
+          format: float
+          example: 20.0
+
+    LogSearchRequest:
+      type: object
+      required:
+        - service
+        - log_dirs
+        - keyword
+      properties:
+        service:
+          type: string
+          description: Service name to search
+          example: api-gateway
+        log_dirs:
+          type: array
+          items:
+            type: string
+          description: Directories to search
+          example: [/var/log/app, /tmp/logs]
+        keyword:
+          type: string
+          description: Search keyword
+          example: ERROR
+        max_results:
+          type: integer
+          description: Maximum results per agent
+          default: 100
+
+    LogSearchResult:
+      type: object
+      properties:
+        agent:
+          type: string
+        logs:
+          type: array
+          items:
+            type: object
+            properties:
+              file:
+                type: string
+              line:
+                type: integer
+              content:
+                type: string
+              timestamp:
+                type: string
+        total_matches:
+          type: integer
+
+    MultiAgentLogSearchResp:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogSearchResult'
+        failed_agents:
+          type: array
+          items:
+            type: string
+        total_matches:
+          type: integer
+
+    AlertRequest:
+      type: object
+      required:
+        - level
+        - message
+      properties:
+        level:
+          type: string
+          enum: [info, warning, error, critical]
+          example: error
+        message:
+          type: string
+          example: High CPU usage detected
+        agent:
+          type: string
+          description: Optional agent name
+        service:
+          type: string
+          description: Optional service name
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Error message
+        code:
+          type: integer
+          example: 400
+        details:
+          type: object
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+tags:
+  - name: Health
+    description: Health check endpoints
+  - name: Metrics
+    description: System metrics endpoints
+  - name: Agents
+    description: Agent management endpoints
+  - name: Logs
+    description: Log search and retrieval
+  - name: Alerts
+    description: Alert notification endpoints
