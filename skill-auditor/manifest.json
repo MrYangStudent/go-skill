@@ -1,0 +1,90 @@
+{
+  "name": "skill-auditor",
+  "version": "1.0.0",
+  "description": "Skill 项目合规性审核工具 - 自动检查 Skill 项目是否符合 Claude CodeBuddy Skill 开发规范，包括 SKILL.md 格式、scripts 脚本规范、reference 资源组织、反模式检测等",
+  "language": "zh-CN",
+  "triggers": [
+    "审核skill",
+    "检查skill",
+    "skill合规",
+    "skill规范",
+    "skill格式",
+    "skill检查",
+    "验证skill",
+    "skill审查",
+    "audit skill",
+    "review skill",
+    "validate skill",
+    "check skill format",
+    "skill structure"
+  ],
+  "capabilities": [
+    "文件结构检查 (SKILL.md, scripts/, reference/)",
+    "YAML Frontmatter 验证",
+    "必需字段检查 (name, description, triggers)",
+    "scripts/ 脚本规范验证",
+    "reference/ 资源组织验证",
+    "manifest.json 结构验证",
+    "反模式检测",
+    "生成合规性报告"
+  ],
+  "check_items": {
+    "required": [
+      {
+        "file": "SKILL.md",
+        "checks": [
+          {"field": "yaml_frontmatter", "description": "文件必须以 --- 开头"},
+          {"field": "name", "description": "小写+连字符，最大64字符", "pattern": "^[a-z][a-z0-9-]*$"},
+          {"field": "description", "description": "20-1024字符，第三人称"},
+          {"field": "triggers", "description": "至少1个触发词"}
+        ]
+      }
+    ],
+    "recommended": [
+      {"file": "manifest.json", "description": "元数据配置"},
+      {"file": "README.md", "description": "使用说明文档"}
+    ],
+    "optional": [
+      {"dir": "scripts/", "description": "确定性计算、复杂算法、数据验证"},
+      {"dir": "reference/", "description": "API文档、配置模板、示例数据"}
+    ]
+  },
+  "validation_rules": {
+    "name_pattern": "^[a-z][a-z0-9-]*$",
+    "name_max_length": 64,
+    "description_min_length": 20,
+    "description_max_length": 1024,
+    "triggers_min_count": 1,
+    "skill_md_max_lines": 500
+  },
+  "anti_patterns": [
+    {"type": "overly_verbose", "description": "过度解释基础知识"},
+    {"type": "time_sensitive", "description": "包含时效性信息"},
+    {"type": "windows_path", "description": "使用 Windows 路径格式"},
+    {"type": "no_examples", "description": "缺少具体示例"},
+    {"type": "skill_too_long", "description": "SKILL.md 过长(>500行)"}
+  ],
+  "design_patterns": [
+    {"name": "workflow", "description": "工作流模式 - 多步骤验证任务"},
+    {"name": "decision_tree", "description": "决策树模式 - 条件分支选择"},
+    {"name": "template", "description": "模板模式 - 一致格式输出"},
+    {"name": "validation", "description": "验证模式 - 输出质量保证"}
+  ],
+  "progressive_loading": {
+    "level_1": {"content": "name + description", "tokens": "~100/skill"},
+    "level_2": {"content": "SKILL.md 主体", "tokens": "~5k"},
+    "level_3": {"content": "scripts + reference", "tokens": "按需"}
+  },
+  "structure": {
+    "layers": [
+      {"name": "SKILL.md", "role": "SOP - 标准作业程序", "required": true},
+      {"name": "scripts/", "role": "工具 - 确定性函数", "required": false},
+      {"name": "reference/", "role": "资源 - API文档配置", "required": false}
+    ]
+  },
+  "output_format": "JSON",
+  "license": "MIT",
+  "references": [
+    "Claude Skills 开发完全指南 (GitHub: sanshao85/claude-skills-guide)"
+  ]
+}
