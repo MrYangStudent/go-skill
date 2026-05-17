@@ -29,6 +29,12 @@ A comprehensive Go language engineering skill set covering the complete developm
 |-------|------|-------------|
 | [test-generator](./test-generator/) | Test Generator | Unit tests, concurrency tests, edge cases, Mock writing |
 
+### Utility Functions
+
+| Skill | Name | Description |
+|-------|------|-------------|
+| [go-utility-functions](./go-utility-functions/) | Go Utility Functions | HTTP client, signing, crypto, sorting, time formatting, generic slice/map conversion, pagination, retry |
+
 ### Code Review
 
 | Skill | Name | Description |
@@ -85,6 +91,7 @@ A comprehensive Go language engineering skill set covering the complete developm
 │  - Error handling                                              │
 │  - Context propagation                                          │
 │  - Logging                                                      │
+│  - go-utility-functions (extract repeated logic into reusable) │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐

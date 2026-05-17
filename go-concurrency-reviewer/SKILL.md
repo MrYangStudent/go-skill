@@ -51,7 +51,7 @@ go func() {
     defer func() {
         if r := recover(); r != nil {
             // 使用 debug.Stack() 获取当前 goroutine 的栈信息
-            log.Printf("[PANIC] recovered: %v\n%S", r, debug.Stack())
+            log.Printf("[PANIC] recovered: %v\n%s", r, debug.Stack())
         }
     }()
     // ... 业务逻辑
@@ -72,7 +72,7 @@ defer safeRecover()  // ❌ 无效
 // 正确：recover 必须在直接的 defer 匿名函数中
 defer func() {
     if r := recover(); r != nil {  // ✅ 有效
-        log.Printf("[PANIC] recovered: %v\n%S", r, debug.Stack())
+        log.Printf("[PANIC] recovered: %v\n%s", r, debug.Stack())
     }
 }()
 ```
@@ -172,10 +172,10 @@ func fetchAll(ctx context.Context, urls []string) []string {
         wg.Add(1)
         go func(idx int, u string) {
             defer func() {
-                wg.Done()
                 if r := recover(); r != nil {
-                    log.Printf("[PANIC] fetchAll worker recovered: %v\n%S", r, debug.Stack())
+                    log.Printf("[PANIC] fetchAll worker recovered: %v\n%s", r, debug.Stack())
                 }
+                wg.Done()
             }()
             select {
             case <-ctx.Done():
@@ -199,10 +199,10 @@ func fetchAll(done <-chan struct{}, urls []string) []string {
         wg.Add(1)
         go func(idx int, u string) {
             defer func() {
-                wg.Done()
                 if r := recover(); r != nil {
-                    log.Printf("[PANIC] fetchAll worker recovered: %v\n%S", r, debug.Stack())
+                    log.Printf("[PANIC] fetchAll worker recovered: %v\n%s", r, debug.Stack())
                 }
+                wg.Done()
             }()
             select {
             case <-done:
@@ -279,10 +279,10 @@ for _, item := range items {
     go func(it Item) {
         wg.Add(1)  // ✗ Add 应该在 goroutine 外
         defer func() {
-            wg.Done()
             if r := recover(); r != nil {
-                log.Printf("[PANIC] worker recovered: %v\n%S", r, debug.Stack())
+                log.Printf("[PANIC] worker recovered: %v\n%s", r, debug.Stack())
             }
+            wg.Done()
         }()
         process(it)
     }(item)
@@ -295,7 +295,7 @@ for _, item := range items {
     go func(it Item) {
         defer func() {
             if r := recover(); r != nil {
-                log.Printf("[PANIC] worker recovered: %v\n%S", r, debug.Stack())
+                log.Printf("[PANIC] worker recovered: %v\n%s", r, debug.Stack())
             }
         }()
         if condition {
@@ -311,13 +311,13 @@ var wg sync.WaitGroup
 for _, item := range items {
     wg.Add(1)
     go func(it Item) {
-        defer func() {
-            wg.Done()
-            if r := recover(); r != nil {
-                log.Printf("[PANIC] worker recovered: %v\n%S", r, debug.Stack())
-            }
-        }()
-        process(it)
+    defer func() {
+        if r := recover(); r != nil {
+            log.Printf("[PANIC] worker recovered: %v\n%s", r, debug.Stack())
+        }
+        wg.Done()
+    }()
+    process(it)
     }(item)
 }
 wg.Wait()
@@ -353,7 +353,7 @@ ch := make(chan int, 10)
 go func() {
     defer func() {
         if r := recover(); r != nil {
-            log.Printf("[PANIC] channel worker recovered: %v\n%S", r, debug.Stack())
+            log.Printf("[PANIC] channel worker recovered: %v\n%s", r, debug.Stack())
         }
     }()
     for i := 0; i < 20; i++ {
@@ -370,7 +370,7 @@ ch := make(chan Task, 100)
 go func() {
     defer func() {
         if r := recover(); r != nil {
-            log.Printf("[PANIC] channel worker recovered: %v\n%S", r, debug.Stack())
+            log.Printf("[PANIC] channel worker recovered: %v\n%s", r, debug.Stack())
         }
     }()
     for task := range ch {  // range 自动检测 channel 关闭
@@ -383,7 +383,7 @@ done := make(chan struct{})
 go func() {
     defer func() {
         if r := recover(); r != nil {
-            log.Printf("[PANIC] channel worker recovered: %v\n%S", r, debug.Stack())
+            log.Printf("[PANIC] channel worker recovered: %v\n%s", r, debug.Stack())
         }
     }()
     for {
@@ -436,7 +436,7 @@ for _, s := range data {
     go func(s string) {
         defer func() {
             if r := recover(); r != nil {
-                log.Printf("[PANIC] loop worker recovered: %v\n%S", r, debug.Stack())
+                log.Printf("[PANIC] loop worker recovered: %v\n%s", r, debug.Stack())
             }
         }()
         fmt.Println(s)  // 每个 goroutine 有独立的 s
@@ -450,7 +450,7 @@ for _, s := range data {
     go func() {
         defer func() {
             if r := recover(); r != nil {
-                log.Printf("[PANIC] loop worker recovered: %v\n%S", r, debug.Stack())
+                log.Printf("[PANIC] loop worker recovered: %v\n%s", r, debug.Stack())
             }
         }()
         fmt.Println(s)  // 正确
@@ -513,11 +513,164 @@ go build -race . && timeout 60 ./your-binary
 go vet ./...
 ```
 
+## 常用封装函数
+
+### PanicHandler 类型定义
+
+```go
+// PanicHandler 处理 recover 到的 panic 值。
+type PanicHandler func(r interface{})
+```
+
+### SafeGo — 基础安全 goroutine 启动
+
+**封装原理**: `recover()` 不能封装为独立函数调用（必须在 `defer` 匿名函数中直接调用才有效），但可以封装整个 goroutine 启动模式——在 `SafeGo` 内部的 `go func()` 中 `defer` 包含 `recover()`，从而为传入的 `fn` 自动添加 panic 防护。
+
+```go
+// SafeGo 安全启动 goroutine，自动捕获 panic 并调用处理函数。
+// 如果未提供 handler，默认使用 log.Printf + debug.Stack() 记录。
+//
+// 注意: recover() 必须在 defer 的匿名函数中直接调用，
+// 封装 recover 本身为独立函数是无效的，但封装整个 goroutine 启动模式是有效的。
+func SafeGo(fn func(), handlers ...PanicHandler) {
+    go func() {
+        defer func() {
+            if r := recover(); r != nil {
+                if len(handlers) > 0 {
+                    for _, h := range handlers {
+                        h(r)
+                    }
+                } else {
+                    log.Printf("[PANIC] goroutine recovered: %v\n%s", r, debug.Stack())
+                }
+            }
+        }()
+        fn()
+    }()
+}
+```
+
+**使用示例**:
+```go
+// 基本用法：自动记录 panic
+SafeGo(func() {
+    doSomething() // 如果 panic，会被 recover 并记录栈信息
+})
+
+// 自定义 panic 处理
+SafeGo(func() {
+    doSomething()
+}, func(r interface{}) {
+    log.Printf("[ALERT] critical panic: %v\n%s", r, debug.Stack())
+    metrics.PanicCounter.Inc()
+})
+```
+
+### SafeGoWithContext — 带 context 控制的安全 goroutine
+
+```go
+// SafeGoWithContext 安全启动受 context 控制的 goroutine。
+// 当 ctx 被取消时 goroutine 自动退出，同时具备 panic 防护。
+func SafeGoWithContext(ctx context.Context, fn func(ctx context.Context), handlers ...PanicHandler) {
+    go func() {
+        defer func() {
+            if r := recover(); r != nil {
+                if len(handlers) > 0 {
+                    for _, h := range handlers {
+                        h(r)
+                    }
+                } else {
+                    log.Printf("[PANIC] goroutine recovered: %v\n%s", r, debug.Stack())
+                }
+            }
+        }()
+        fn(ctx)
+    }()
+}
+```
+
+**使用示例**:
+```go
+ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+defer cancel()
+
+SafeGoWithContext(ctx, func(ctx context.Context) {
+    for {
+        select {
+        case <-ctx.Done():
+            return // 优雅退出
+        default:
+            processNext()
+        }
+    }
+})
+```
+
+### SafeGoGroup — 批量安全 goroutine 启动
+
+```go
+// SafeGoGroup 批量安全启动 goroutine 并等待全部完成。
+// 收集所有 panic 为 error 返回，不会因为单个 panic 影响其他 goroutine。
+func SafeGoGroup(fns ...func() error) []error {
+    var (
+        wg   sync.WaitGroup
+        mu   sync.Mutex
+        errs []error
+    )
+
+    for i, fn := range fns {
+        wg.Add(1)
+        go func(idx int, f func() error) {
+            defer func() {
+                if r := recover(); r != nil {
+                    mu.Lock()
+                    errs = append(errs, fmt.Errorf("goroutine[%d] panic: %v", idx, r))
+                    mu.Unlock()
+                }
+                wg.Done()
+            }()
+            if err := f(); err != nil {
+                mu.Lock()
+                errs = append(errs, fmt.Errorf("goroutine[%d] error: %w", idx, err))
+                mu.Unlock()
+            }
+        }(i, fn)
+    }
+
+    wg.Wait()
+    return errs
+}
+```
+
+**使用示例**:
+```go
+errs := SafeGoGroup(
+    func() error { return fetchURL(url1) },
+    func() error { return fetchURL(url2) },
+    func() error { return fetchURL(url3) },
+)
+for _, err := range errs {
+    log.Printf("task failed: %v", err)
+}
+```
+
+### 封装使用检查规则
+
+审查时如果发现裸 `go func()` 调用，应建议替换为 `SafeGo` 系列：
+
+| 裸调用模式 | 推荐替换 |
+|------------|----------|
+| `go func() { ... }()` | `SafeGo(func() { ... })` |
+| `go func() { ... }()` + context | `SafeGoWithContext(ctx, func(ctx context.Context) { ... })` |
+| 循环中 `go func() { ... }()` + WaitGroup | `SafeGoGroup(fns...)` |
+
+---
+
 ## 最佳实践
 
-1. **Panic 防护**: 所有 goroutine 必须使用 `defer func() { recover() }()` 封装
-2. **SafeGo 封装**: 创建统一的 goroutine 启动函数，自动添加 panic 防护
-3. **明确生命周期**: 每个 goroutine 必须有明确的退出机制
+1. **Panic 防护**: 所有 goroutine 必须使用 `SafeGo` 系列函数启动，自动添加 panic 防护
+2. **SafeGo 封装**: 使用 `SafeGo` / `SafeGoWithContext` / `SafeGoGroup` 替代裸 `go func()` 调用
+3. **明确生命周期**: 每个 goroutine 必须有明确的退出机制（context 或 done channel）
 4. **避免锁内阻塞**: 互斥锁内不应有 I/O 操作
 5. **超时控制**: 所有外部调用必须设置超时
 6. **channel 封装**: 不直接暴露 channel，使用函数封装

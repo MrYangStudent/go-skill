@@ -20,7 +20,9 @@ workflow:
 
     - stage: implementation
       name: 代码实现
-      description: 遵循 Go 规范编写代码
+      skills:
+        - go-utility-functions
+      description: 遵循 Go 规范编写代码，识别重复逻辑封装为工具函数
       
     - stage: testing
       name: 测试生成
@@ -58,7 +60,7 @@ workflow:
 
 ## 概览
 
-本工作流整合 13 个专项技能，覆盖 Go 项目开发全生命周期：
+本工作流整合 14 个专项技能，覆盖 Go 项目开发全生命周期：
 
 ```
 阶段零：项目治理
@@ -69,7 +71,8 @@ workflow:
 └── doc-generator                  (项目文档、结构说明)
 
 阶段二：代码实现
-└── 遵循开发规范 + doc-generator
+├── 遵循开发规范 + doc-generator
+└── go-utility-functions            (工具函数封装)
 
 阶段三：测试生成
 └── test-generator                 (单元测试、Mock)
