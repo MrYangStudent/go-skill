@@ -306,8 +306,7 @@ Register-ScheduledTask -TaskName "GitHubTrend" -Trigger $trigger -Action $action
 ### 数据抓取策略
 
 1. **优先直连**：尝试爬取 GitHub 页面（需网络通畅）
-2. **备用 API**：直连失败时，使用 `https://api.gitterapp.com/repositories` 第三方 API
-3. **代理支持**：自动读取 `HTTPS_PROXY` / `HTTP_PROXY` 环境变量
+2. **代理支持**：自动读取 `HTTPS_PROXY` / `HTTP_PROXY` 环境变量
 
 ### AI 简报生成
 
