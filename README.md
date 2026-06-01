@@ -13,6 +13,14 @@ A comprehensive Go language engineering skill set covering the complete developm
 | [go-project-rules](./go-project-rules/) | Project Governance Rules | progress sync, README sync, commit checks, verification loop |
 | [go-full-dev-workflow](./go-full-dev-workflow/) | Full Development Workflow | Integrates 13 skills for end-to-end development |
 
+### prompt-master
+
+**Prompt Master**, a conversational prompt engineering skill based on Andrew Ng's AI Prompting for Everyone course.
+
+| Skill | Name | Description |
+|-------|------|-------------|
+| [prompt-master](./prompt-master/) | Prompt Master | Conversational prompt construction, optimization, and templates |
+
 ## Complete Skills List
 
 ### Development Workflow

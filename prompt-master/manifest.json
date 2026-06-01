@@ -1,0 +1,94 @@
+{
+  "name": "prompt-master",
+  "version": "1.0.0",
+  "description": "提示词大师 - 通过对话式引导逐步构建和优化 AI 提示词，完整覆盖吴恩达《AI Prompting for Everyone》课程：头脑风暴、迎合性认知、AI推理、AI评审、写作工作流、信息检索对比、图像生成、应用构建等",
+  "language": "zh-CN",
+  "triggers": [
+    "提示词",
+    "写提示词",
+    "优化prompt",
+    "prompt优化",
+    "提示词工程",
+    "prompt engineer",
+    "写prompt",
+    "构建提示词",
+    "提示词模板",
+    "prompt template",
+    "向AI提问",
+    "prompt master",
+    "提示词大师",
+    "头脑风暴",
+    "脑暴",
+    "brainstorming",
+    "AI评审",
+    "评审文章",
+    "AI critique",
+    "写作工作流",
+    "减少AI腔",
+    "AI slop",
+    "迎合性",
+    "谄媚",
+    "sycophancy",
+    "推理分析",
+    "方案比较",
+    "AI reasoning",
+    "图像生成提示词",
+    "构建应用",
+    "深度研究",
+    "deep research",
+    "反迎合",
+    "魔鬼代言人"
+  ],
+  "capabilities": [
+    "对话式提示词构建（六步框架）",
+    "头脑风暴与创意激发（角色切换、限制激发、魔鬼代言人）",
+    "迎合性(Sycophancy)认知与反迎合提问",
+    "AI推理与方案比较（多标准决策分析）",
+    "AI评审（Rubric评价、先证据再打分）",
+    "AI写作工作流（先结构后正文、减少AI腔）",
+    "信息获取方式对比（预训练知识/网络搜索/深度研究）",
+    "图像生成Prompt构建（主体/场景/动作/风格/细节）",
+    "迷你应用构建（Goal/Input/Output公式）",
+    "数据分析（AI写代码运行分析）",
+    "场景适配（写作/编程/数据分析/学习/创意/评审/图像/应用）"
+  ],
+  "design_patterns": [
+    "工作流模式",
+    "决策树模式",
+    "验证模式"
+  ],
+  "progressive_loading": {
+    "level_1": {
+      "description": "name + description，约 100 tokens",
+      "content": "元数据匹配"
+    },
+    "level_2": {
+      "description": "SKILL.md 主体，约 5k tokens",
+      "content": "核心工作流和进阶技巧"
+    },
+    "level_3": {
+      "description": "reference/ 目录文件，按需加载",
+      "content": "模板集(22个)和课程知识参考(17章完整覆盖)"
+    }
+  },
+  "structure": {
+    "layers": [
+      {
+        "name": "SKILL.md",
+        "role": "SOP",
+        "required": true
+      },
+      {
+        "name": "scripts/",
+        "role": "工具",
+        "required": false
+      },
+      {
+        "name": "reference/",
+        "role": "资源",
+        "required": false
+      }
+    ]
+  },
+  "license": "MIT"
+}
