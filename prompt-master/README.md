@@ -47,11 +47,12 @@ prompt-master/
 ├── manifest.json                   # 元数据配置
 ├── README.md                       # 本文件
 └── reference/
-    ├── prompt_templates.md         # 22 个场景模板
-    ├── course_reference.md         # 课程知识要点（17 章）
-    ├── case_studies.md             # 5 个真实前后对比案例
-    ├── advanced_techniques.md      # 进阶技术（ToT/ReAct/链接/元提示/压缩）
-    └── scoring_rubric.md           # 提示词质量量化评分体系
+    ├── prompt_templates.md              # 34 个场景模板
+    ├── course_reference.md              # 课程知识要点（17 章）
+    ├── case_studies.md                  # 5 个真实前后对比案例
+    ├── advanced_techniques.md           # 进阶技术（ToT/ReAct/链接/元提示/压缩）
+    ├── scoring_rubric.md                # 提示词质量量化评分体系
+    └── community_prompt_examples.md     # 社区提示词分类示例库（14 大类，50+ 示例）
 ```
 
 ## 参考来源
