@@ -1,0 +1,12 @@
+{
+  "id": "project-rules-init",
+  "name": "Project Rules Init",
+  "version": "1.0.0",
+  "type": "skill",
+  "description": "项目初始化时自动检测语言/框架，生成项目规则文件（架构导航、阶段流程、技能匹配矩阵），并执行规则自检",
+  "author": "ai-video-pipeline",
+  "tags": ["rules", "project-init", "code-generation", "multi-language"],
+  "platforms": ["vscode", "codebuddy"],
+  "entry": "SKILL.md",
+  "languages": ["go", "python", "javascript", "typescript", "rust"]
+}
