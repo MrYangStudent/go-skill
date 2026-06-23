@@ -21,6 +21,14 @@ A comprehensive Go language engineering skill set covering the complete developm
 |-------|------|-------------|
 | [prompt-master](./prompt-master/) | Prompt Master | Conversational prompt construction, optimization, and templates |
 
+### context-compressor
+
+**Context Compressor**, intelligent tool output and conversation context compression to reduce token costs.
+
+| Skill | Name | Description |
+|-------|------|-------------|
+| [context-compressor](./context-compressor/) | Context Compressor | Smart compression with content-type detection, specialized strategies, and tiered hot/cold storage |
+
 ## Complete Skills List
 
 ### Development Workflow
@@ -63,6 +71,12 @@ A comprehensive Go language engineering skill set covering the complete developm
 |-------|------|-------------|
 | [doc-generator](./doc-generator/) | Documentation Generator | GoDoc comments, README, AI-friendly example blocks |
 | [go-api-doc-generator](./go-api-doc-generator/) | API Documentation Generator | OpenAPI 3.0 specs, Postman collections, curl commands |
+
+### General Tools
+
+| Skill | Name | Description |
+|-------|------|-------------|
+| [context-compressor](./context-compressor/) | Context Compressor | Intelligent tool output and conversation compression, tiered hot/cold storage, 7 content types detection |
 
 ## Features
 
@@ -317,6 +331,19 @@ API documentation generator:
 - Postman Collection v2.1
 - curl command examples
 - Supports gorilla/mux, chi, Gin, net/http
+
+### General Tools
+
+#### context-compressor
+
+Intelligent tool output and conversation context compression:
+
+- **7 content types detection**: JSON/code/lint/log/search/diff/text auto-detection
+- **Smart routing compression**: Specialized compressors per type preserving critical information
+- **Tiered storage (CCR)**: L1 Hot (Memory 15min) → L2 Cold (SQLite 2h) → L3 Removed
+- **Session statistics**: Cumulative token savings, per-type stats, tier storage status, cost estimation
+- **Cache management**: Hot/cold bidirectional promotion, eviction, and manual cleanup
+- **8 MCP tools**: compress, retrieve, detect, stats, tier summary, cold query, cache clear, list cached
 
 ## Code Standards
 

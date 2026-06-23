@@ -1,0 +1,6 @@
+# Cross-process shared cold storage (runtime data, not version-controlled)
+cache/
+
+# Generated daily reports (regenerated each day)
+reports/
+__pycache__/

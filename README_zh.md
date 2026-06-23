@@ -13,6 +13,14 @@
 | [go-project-rules](./go-project-rules/) | 项目治理规则 | 进度同步、README 联动、提交检查、验证闭环 |
 | [go-full-dev-workflow](./go-full-dev-workflow/) | 完整开发工作流 | 整合 14 个技能的全链路开发流程 |
 
+### context-compressor
+
+**上下文压缩技能**，智能压缩工具输出和对话上下文以降低 token 消耗。
+
+| 技能 | 名称 | 描述 |
+|------|------|------|
+| [context-compressor](./context-compressor/) | 上下文压缩 | 内容类型感知压缩、三级热/冷存储、会话统计 |
+
 ## 完整技能列表
 
 ### 开发流程
@@ -55,6 +63,12 @@
 |------|------|------|
 | [doc-generator](./doc-generator/) | 文档生成器 | GoDoc 注释、README、AI 友好示例块 |
 | [go-api-doc-generator](./go-api-doc-generator/) | API 文档生成器 | OpenAPI 3.0 规范、Postman 集合、curl 命令 |
+
+### 通用工具
+
+| 技能 | 名称 | 描述 |
+|------|------|------|
+| [context-compressor](./context-compressor/) | 上下文压缩 | 智能内容压缩，7 种类型检测、三级热/冷存储、8 个 MCP 工具 |
 
 ## 核心特性
 
@@ -309,6 +323,19 @@ API 文档生成器，从 Go HTTP handler 生成完整文档：
 - Postman Collection v2.1
 - curl 命令示例
 - 支持 gorilla/mux、chi、Gin、net/http
+
+### 通用工具
+
+#### context-compressor
+
+上下文压缩技能，智能压缩工具输出和对话上下文：
+
+- **7 种内容类型检测**：JSON/代码/lint/日志/搜索/diff/文本，自动识别
+- **智能路由压缩**：每种类型专用压缩器，保留关键信息
+- **三级存储 (CCR)**：L1 热存储 (Memory 15min) → L2 冷存储 (SQLite 2h) → L3 移除
+- **会话统计**：累计 token 节省、按类型统计、三级存储状态、费用预估
+- **缓存管理**：热/冷双向提升、淘汰和手动清理
+- **8 个 MCP 工具**：压缩、检索、类型检测、统计、存储概览、冷查询、缓存清理、列表
 
 ## 代码规范
 

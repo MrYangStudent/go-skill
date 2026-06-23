@@ -1,0 +1,33 @@
+{
+  "name": "context-compressor",
+  "version": "1.0.0",
+  "description": "Intelligent tool output and conversation context compression to reduce token costs. Detects 7 content types and applies specialized compression strategies with tiered hot/cold storage.",
+  "language": "python",
+  "capabilities": [
+    "context-compression",
+    "content-type-detection",
+    "caching",
+    "statistics-tracking",
+    "daily-reporting",
+    "hook-integration"
+  ],
+  "mcp_tools": [
+    "compress_content",
+    "retrieve_full_content",
+    "detect_type",
+    "get_compression_stats",
+    "get_tier_summary",
+    "cold_query",
+    "clear_cache",
+    "list_cached"
+  ],
+  "scripts": {
+    "core": "scripts/compress.py",
+    "mcp_server": "scripts/mcp_compress_server.py",
+    "hook_adapter": "scripts/hook_compress.py",
+    "daily_report": "scripts/daily_report.py"
+  },
+  "compatibility": {
+    "python": ">=3.10"
+  }
+}
