@@ -21,44 +21,199 @@ triggers:
 
 ## 角色定义
 
-核心能力：需求拆解、代码生成、测试覆盖、质量审查。
+核心能力：需求拆解、胶水编程、知识沉淀、自测验证、质量审查。
 
 ## 核心原则
 
-1. **增量优先** - 新增代码独立成模块，不侵入旧代码
-2. **最小变更** - 尽量通过扩展而非修改来添加功能
-3. **测试先行** - 新代码必须有完整测试覆盖
-4. **质量门禁** - 通过多重审查确保代码质量
+1. **胶水编程** - 优先复用现有代码，通过组合已有方法/函数实现新功能；能不新写就不新写
+2. **最小变更** - 只改动与当前功能直接相关的代码，不重构、不重命名、不清理
+3. **知识沉淀** - 每次开发后将可复用模式保存至知识库，根据文件时间戳判断是否需要重建索引
+4. **测试先行** - 新代码必须有完整测试覆盖
+5. **零 Side Effect** - 不引入新依赖、不改已有接口签名、不改已有测试
+
+## 需求收集（必须先执行）
+
+在开始任何开发工作前，必须执行以下需求澄清：
+
+1. **询问是否存在以下输入**：
+   - 接口文档 / OpenAPI 规范
+   - 产品 PRD 或原型设计
+   - 竞品或参考实现
+2. **询问是否存在可参考的代码流程**：
+   - 项目中是否有功能相似或逻辑相近的既有代码？
+   - 是否有可复用的工具函数、数据结构、中间件？
+3. **确认功能边界**：
+   - 新增功能的大致输入和输出是什么？
+   - 涉及哪些已有包/模块？（影响范围）
+   - 是否需要修改数据库 Schema 或配置文件？
+   - 新增功能是否影响向后兼容？
+
+> 如果需求不清晰，优先向用户提出不超过 3 个澄清问题。
+
+---
+
+## 知识库
+
+> 用于沉淀项目中可复用的工具函数、设计模式、配置样式等。每次开发后自动更新。
+> 配套管理工具：`tools/knowledge/knowledge.exe`
+
+### 知识库文件约定
+
+```
+project-knowledge/
+├── INDEX.md              # 索引清单（列出所有知识条目及最后更新时间戳）
+├── common-utils.md       # 默认写入文件（标签为 general 时）
+├── <标签名>.md            # 根据标签自动创建的分类文件
+```
+
+> **注意**: 文件由 `knowledge add` 命令自动创建和管理，根据条目标签决定写入哪个文件，无需手动维护。
+
+### 使用流程
+
+| 步骤 | 操作 | 对应命令 |
+|------|------|----------|
+| **① 初始化** | 创建知识库目录和索引文件 | `knowledge init` / `knowledge init --example` |
+| **② 搜索** | 全文搜索已有知识条目（按标题/标签/用途相关性排序） | `knowledge search <关键词>` |
+| **③ 添加** | 新增知识条目（交互式或命令行） | `knowledge add` / `knowledge add -t "标题" -s "来源"` |
+| **④ 重建索引** | 从内容文件重新生成 INDEX.md（手动编辑后使用） | `knowledge reindex` |
+| **⑤ 检查时效** | 对比条目来源文件的修改时间，标记过期条目 | `knowledge check-stale <项目目录>` |
+| **⑥ 列出** | 查看所有条目，支持 --stale 参数过滤过期 | `knowledge list` / `knowledge list --stale <目录>` |
+
+### 知识条目格式
+
+```markdown
+<!-- id: entry-1719254400 -->
+## [search, slice] SearchUtils - 通用切片搜索函数
+
+**标签**: search, slice, filter
+**来源**: pkg/slicex/search.go
+**更新**: 2026-06-25
+**用途**: 在切片中快速搜索符合条件的首个元素
+
+```go
+result := slicex.Search(users, func(u User) bool {
+    return u.ID == targetID
+})
+```
+
+---
+```
+
+### 构建工具
+
+```bash
+# 方式一：使用 Makefile（推荐）
+make build-knowledge   # 构建（当前系统）
+make build GOOS=linux  # 跨平台编译到 Linux
+make build GOOS=darwin # 跨平台编译到 macOS
+make test-knowledge    # 测试
+make vet-knowledge     # 静态检查
+make clean             # 清理
+
+# 方式二：手动构建
+cd tools/knowledge
+go build -o knowledge.exe .
+```
+
+### 快速开始
+
+```bash
+# 1. 构建工具
+cd tools/knowledge && go build -o knowledge.exe . && cd ../..
+
+# 2. 初始化知识库（含 5 条示例条目）
+knowledge init --example
+
+# 3. 查看示例条目
+knowledge list
+
+# 4. 搜索示例
+knowledge search cache
+
+# 5. 开始添加自己的知识
+knowledge add -t "[page] 功能名 - 简述" -s "pkg/xxx/xxx.go" -p "用途描述"
+```
+
+> 完整示例条目见 [reference/project-knowledge-example.md](reference/project-knowledge-example.md)
 
 ---
 
 ## 增量开发策略
 
-> 详细策略见 [reference/05-incremental-strategy.md](reference/05-incremental-strategy.md)
+> 核心：**胶水编程** — 能复用不新写，能内联不新建。
 
-### 核心策略
+### 策略优先级
 
-| 策略 | 说明 |
-|------|------|
-| 扩展优于修改 | 通过接口扩展新功能 |
-| 依赖注入解耦 | 面向接口编程 |
-| 适配器模式 | 隔离新旧代码交互 |
-| Feature Flag | 配置控制功能开关 |
+| 优先级 | 策略 | 适用场景 |
+|--------|------|----------|
+| **P0** | **内联扩展** - 在现有文件中新增导出函数/方法 | 功能与现有包逻辑紧密相关 |
+| **P1** | **组合复用** - 通过组合多个现有模块实现新功能 | 功能横跨多个现有模块 |
+| **P2** | **适配器模式** - 写适配器对接新旧代码 | 新旧代码接口不一致 |
+| **P3** | **新模块独立目录** - 创建 `internal/features/<name>` | 功能完全独立，与现有代码无强关联 |
+
+---
+
+## 增量开发策略
+
+> 核心：**胶水编程** — 能复用不新写，能内联不新建。
+
+### 策略优先级
+
+| 优先级 | 策略 | 适用场景 |
+|--------|------|----------|
+| **P0** | **内联扩展** - 在现有文件中新增导出函数/方法 | 功能与现有包逻辑紧密相关 |
+| **P1** | **组合复用** - 通过组合多个现有模块实现新功能 | 功能横跨多个现有模块 |
+| **P2** | **适配器模式** - 写适配器对接新旧代码 | 新旧代码接口不一致 |
+| **P3** | **新模块独立目录** - 创建 `internal/features/<name>` | 功能完全独立，与现有代码无强关联 |
+
+### 内联扩展示例
+
+```go
+// ✓ 正确：在现有包中新增方法（最小改动）
+package service
+
+// 现有方法
+func (s *Service) GetUser(id string) (*User, error) { ... }
+
+// 新增方法（直接加在同一个文件）
+func (s *Service) BatchGetUsers(ids []string) ([]*User, error) {
+    // 复用现有的 GetUser
+    var users []*User
+    for _, id := range ids {
+        user, err := s.GetUser(id)
+        if err != nil {
+            return nil, fmt.Errorf("batch get user %s: %w", id, err)
+        }
+        users = append(users, user)
+    }
+    return users, nil
+}
+```
 
 ### 代码示例
 
 ```go
-// ✓ 正确：创建新实现，通过接口扩展
-type Processor interface {
-    Process() error
+// ✓ 正确：复用知识库中的工具函数
+func ProcessItems(ctx context.Context, items []Item) (Result, error) {
+    // 从知识库中查到有 slicex.Filter，直接复用
+    activeItems := slicex.Filter(items, func(i Item) bool {
+        return i.Active
+    })
+    // ...
 }
 
-type NewProcessor struct {
-    // 新依赖
-}
-
-func (p *NewProcessor) Process() error {
-    // 新逻辑...
+// ✓ 正确：P0 - 内联扩展
+func (s *Service) NewFeature(ctx context.Context, req Request) (*Response, error) {
+    // 直接复用现有方法
+    user, err := s.GetUser(req.UserID)
+    if err != nil {
+        return nil, err
+    }
+    data, err := s.cache.Get(ctx, user.Key())
+    if err != nil {
+        return nil, err
+    }
+    return &Response{Data: data}, nil
 }
 ```
 
@@ -69,21 +224,19 @@ func (p *NewProcessor) Process() error {
 > 详细流程图见 [reference/01-workflow.md](reference/01-workflow.md)
 
 ```
-边界确认 → 需求分析 → 模块设计 → 代码实现 → 测试生成 → 质量审查 → 集成验证 → 文档沉淀
+需求收集 → 知识库检查 → 增量编码 → 知识保存 → 自测验证 → 集成验证
 ```
 
 ### 阶段概览
 
 | 阶段 | 产出 | 关键检查点 |
 |------|------|------------|
+| 需求收集 | 需求澄清清单 + 参考代码索引 | 用户确认 |
 | 边界确认 | 影响分析报告 | 不改动旧代码 |
-| 需求分析 | 功能拆解 | 用户确认 |
-| 模块设计 | 接口定义 | 依赖注入 |
-| 代码实现 | Go 代码 | GoDoc 注释 |
-| 测试生成 | 测试用例 | 覆盖率 > 80% |
-| 质量审查 | 审查报告 | 0 严重问题 |
-| 集成验证 | 构建产物 | go build 通过 |
-| 文档沉淀 | README/CHANGELOG | 完整性 |
+| 增量编码 | Go 代码（优先 P0-P2 复用） | GoDoc 注释 + 零 Side Effect |
+| 自测验证 | 测试用例 + 运行结果 | 覆盖率 > 80%、go build 通过 |
+| 集成验证 | 构建产物 | go build + go test -race 通过 |
+| 知识沉淀 | 知识库条目 | 条目已写入 project-knowledge/ |
 
 ---
 
@@ -129,6 +282,7 @@ func Test_<Unit>_<Scenario>(t *testing.T) {
 | `Test_<Unit>_<Scenario>` | 正常/错误路径 |
 | `Test_<Unit>_EdgeCases` | 边界情况 |
 | `Test_<Unit>_Concurrent` | 并发测试 |
+| `Benchmark_<Unit>` | 性能基准测试 |
 
 ---
 
@@ -211,6 +365,9 @@ func FindUser(id string) (*User, error) {
 | `cachex` | 并发安全缓存 |
 | `ctxx` | Context 值工具 |
 | `httpx` | HTTP 客户端 |
+| `strx` | 字符串截断、包含、大小写转换 |
+| `timex` | 时间戳与字符串互转、格式化 |
+| `errx` | 泛型错误断言、错误链检查 |
 
 ### 示例
 
@@ -281,24 +438,128 @@ func Add(a, b int) int {
 
 ---
 
-## 工具命令
+## 技能链集成（Skill Chain）
 
-```bash
-# 创建新模块目录
-mkdir -p internal/features/<feature_name>
+本技能可与其他审查/生成技能串联使用，构成完整闭环：
 
-# 编译测试
-go build ./internal/features/<feature_name>
-go test -race -cover ./internal/features/<feature_name>
+| 阶段 | 调用技能 | 目的 |
+|------|----------|------|
+| 编码后 → 测试前 | `test-generator` | 为新代码生成 table-driven tests |
+| 测试后 → 审查前 | `error-handling-reviewer` | 审查新代码的错误处理是否规范 |
+| 审查前 | `go-concurrency-reviewer` | 涉及 goroutine 时审查并发安全 |
+| 审查前 | `performance-reviewer` | 审查热路径性能问题 |
+| 审查前 | `security-reviewer` | 审查安全漏洞（注入、敏感信息） |
+| 审查前 | `logging-reviewer` | 审查日志级别和脱敏 |
+| 审查前 | `api-design-reviewer` | 审查 API 端点设计 |
+| 集成后 | `doc-generator` | 生成模块文档和注释 |
+| 集成后 | `go-api-doc-generator` | 生成 OpenAPI 文档 |
 
-# 静态检查
-go vet ./internal/features/<feature_name>
-gofmt -l ./internal/features/<feature_name>
+> 使用方式：完成增量编码后，根据变更类型选择对应审查技能。例如新增了 API 端点，则依次调用 `api-design-reviewer` → `error-handling-reviewer` → `go-api-doc-generator`。
 
-# 完整验证
-go build ./...
-go test -race -cover ./...
-go vet ./...
+---
+
+## 冲突解决指南
+
+当用户请求与核心原则冲突时：
+
+| 用户请求 | 冲突原则 | 处理方式 |
+|----------|----------|----------|
+| "顺便重构一下这个老模块" | **最小变更** | 礼貌拒绝，建议单独开任务重构 |
+| "新增一个第三方库来处理这个" | **零 Side Effect** | 先用标准库实现，如确有必要再评估 |
+| "把整个 handler 重写一遍" | **胶水编程** | 识别可复用部分，只改需改的部分 |
+| "改一下这个接口签名让它兼容" | **不改已有接口签名** | 用适配器模式包装，不改原签名 |
+| "帮我把项目升级到 Go 1.23" | **只改功能相关** | 建议此任务单独处理，非增量开发范畴 |
+
+---
+
+## 反模式（禁止行为）
+
+| # | 反模式 | 正确做法 |
+|---|--------|----------|
+| ❌ | **全量审查/重构** — 对整个项目做代码审查、现代化改造 | 只审查新代码或修改行 |
+| ❌ | **过度抽象** — 为两行代码创建接口/新包 | 现有文件中内联扩展现有结构体的方法 |
+| ❌ | **擅自引入依赖** — 新增第三方库 | 标准库+项目已有工具函数优先；确有必要时说明理由并固定版本 |
+| ❌ | **大范围修改** — 改了一个函数却连带改了十个文件 | 一次只改与功能直接相关的文件 |
+| ❌ | **修改旧测试** — 修改已有测试文件来适配新代码 | 新代码适配旧接口，新增测试只写新文件 |
+| ❌ | **panic 控制流** — 用 panic 传递正常错误 | 所有错误通过 error 返回值传播 |
+| ❌ | **并发泄露** — 启动 goroutine 不指定退出条件 | 使用 context.Context 或 done channel 明确生命周期 |
+
+## 输出格式指导
+
+AI 在每次增量开发对话中，应遵循以下输出结构：
+
+### Step 1: 需求理解
+
+```markdown
+📋 **需求理解**
+- 新增功能：<一句话描述>
+- 需求文档：<存在/不存在，路径>
+- 相似参考：<文件路径及关键函数/方法>
+- 影响范围：<涉及的包/文件列表>
+```
+
+### Step 2: 知识库状态
+
+```markdown
+📚 **知识库状态**
+- 知识库文件：<存在/不存在>
+- 索引状态：<有效/过时/未初始化>
+- 判断依据：<知识库时间戳 vs 代码最后修改时间>
+- 本次复用：<从知识库中使用的条目>
+- 本次新增：<本次新增的知识条目>
+```
+
+### Step 3: 开发计划
+
+```markdown
+📝 **开发计划**
+1. [P0/P1/P2/P3] <改动描述>
+   - 文件: <文件路径>
+   - 改动: <新增函数/修改行数>
+2. [P0/P1/P2/P3] <改动描述>
+   ...
+```
+
+### Step 4: 编码与测试
+
+```markdown
+⚙️ **编码中** — <当前改动描述>
+- 复用：<复用了什么已有代码>
+- 新增：<新增了什么>
+
+✅ **自测结果**
+- `go build`：<通过/失败>
+- `go test -race -cover`：<通过/失败，覆盖率>
+- `go vet`：<通过/失败>
+```
+
+### Step 5: 知识保存
+
+```markdown
+💾 **知识保存**
+- 新增条目：<条目名>
+- 保存位置：<project-knowledge/xxx.md>
+- 更新日期：YYYY-MM-DD
+```
+
+---
+
+## 快速启动流程（AI 首轮回复模板）
+
+当触发增量开发请求时，AI 应首先回复以下内容并等待用户确认：
+
+```
+📋 【需求收集】
+请提供以下信息（如已提供可跳过）：
+1. 是否有接口文档/PRD/原型？ 
+2. 是否有可参考的现有代码（功能相似的文件路径）？
+3. 新增功能的大致输入和输出是什么？
+
+📚 【知识库检查】
+- 知识库状态：<存在/不存在>
+- 下一步：<加载索引 / 首次构建>
+
+请确认以上信息后我将开始开发。
 ```
 
 ---
@@ -313,6 +574,10 @@ go vet ./...
 | [reference/04-utility-functions.md](reference/04-utility-functions.md) | 工具函数封装 |
 | [reference/05-incremental-strategy.md](reference/05-incremental-strategy.md) | 增量开发策略 |
 | [reference/06-documentation.md](reference/06-documentation.md) | 文档生成模板 |
+| [reference/project-knowledge-example.md](reference/project-knowledge-example.md) | 知识库初始化参考文件（5条示例条目） |
+| [tools/knowledge/main.go](tools/knowledge/main.go) | 知识库管理 CLI 工具（源码） |
+| [tools/knowledge/main_test.go](tools/knowledge/main_test.go) | 知识库工具单元测试 |
+| [Makefile](Makefile) | 构建与测试辅助命令 |
 
 ---
 
@@ -326,3 +591,8 @@ go vet ./...
 - "在不改动旧代码的情况下"
 - "新增需求"
 - "feature development"
+- "胶水编程"
+- "知识库"
+- "参照现有代码"
+- "最小改动"
+- "project knowledge"
