@@ -90,7 +90,6 @@ func printUsage() {
 
 用法:
   knowledge init                   初始化知识库目录结构
-  knowledge init --example         初始化知识库并导入示例条目（5条参考）
   knowledge add                   交互式添加知识条目
   knowledge add -t "标题" -s "来源" -p "用途" [-e "示例代码"]  命令行添加
   knowledge search <关键词>        搜索知识条目
@@ -104,12 +103,6 @@ func printUsage() {
 // ---------- init ----------
 
 func runInit(args []string) {
-	withExample := false
-
-	fs := flag.NewFlagSet("init", flag.ExitOnError)
-	fs.BoolVar(&withExample, "example", false, "使用示例条目初始化知识库")
-	_ = fs.Parse(args)
-
 	dir := filepath.Join(".", kbDirName)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		fmt.Fprintf(os.Stderr, "创建目录失败: %v\n", err)
@@ -118,7 +111,7 @@ func runInit(args []string) {
 
 	indexPath := filepath.Join(dir, indexFile)
 	if _, err := os.Stat(indexPath); err == nil {
-		fmt.Println("知识库已存在，跳过初始化。")
+		fmt.Println("✅ 知识库已存在，跳过初始化。")
 		return
 	}
 
@@ -137,16 +130,6 @@ func runInit(args []string) {
 	}
 
 	fmt.Printf("✅ 知识库已初始化: %s\n", dir)
-
-	if withExample {
-		examplePath := filepath.Join(dir, "common-utils.md")
-		if err := os.WriteFile(examplePath, []byte(exampleContent()), 0o644); err != nil {
-			fmt.Fprintf(os.Stderr, "写入示例文件失败: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Println("📚 已导入 5 条示例条目，可用 `knowledge list` 查看。")
-		fmt.Println("💡 参考文件: reference/project-knowledge-example.md")
-	}
 }
 
 // ---------- reindex ----------
