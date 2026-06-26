@@ -1,45 +1,63 @@
 # go-incremental-dev 辅助命令
 # 用法: make <target> [GOOS=linux] [GOARCH=arm64]
-# 默认编译当前操作系统，支持跨平台
+# 环境变量: GOOS windows|linux|darwin, GOARCH amd64|arm64
 
-.PHONY: all build-knowledge build test-knowledge vet-knowledge clean
+.PHONY: help all build-knowledge build build-linux build-darwin build-win test-knowledge vet-knowledge fmt clean
+
+# ---- 默认 ----
+help:
+	@echo "用法: make <target> [选项]"
+	@echo ""
+	@echo "构建:"
+	@echo "  build-knowledge    编译 knowledge 工具（当前系统）"
+	@echo "  build GOOS=linux   跨平台编译（可指定 GOOS/GOARCH）"
+	@echo "  build-linux        编译到 Linux amd64"
+	@echo "  build-darwin       编译到 macOS amd64"
+	@echo "  build-win          编译到 Windows amd64"
+	@echo ""
+	@echo "检查:"
+	@echo "  test-knowledge     运行 knowledge 工具测试"
+	@echo "  vet-knowledge      静态检查 knowledge 工具"
+	@echo "  fmt                格式化 knowledge 工具代码"
+	@echo "  clean              清理构建产物"
+	@echo ""
+	@echo "变量: GOOS=linux|darwin|windows  GOARCH=amd64|arm64"
 
 all: build-knowledge test-knowledge vet-knowledge
 
-# ---- 默认：编译当前系统 ----
+# ---- 构建当前系统 ----
 build-knowledge:
-	cd tools\knowledge && go build -o knowledge.exe .
+	cd tools/knowledge && go build -o knowledge$(EXT) .
 
 # ---- 跨平台编译 ----
-# 用法: make build GOOS=linux          (Linux amd64)
-#       make build GOOS=darwin         (macOS amd64)
-#       make build GOOS=windows        (Windows amd64)
-#       make build GOOS=linux GOARCH=arm64  (Linux arm64)
-GOOS ?= windows
-GOARCH ?= amd64
-EXT := $(if $(filter windows,$(GOOS)),.exe,)
+# Go 原生支持 GOOS=linux GOARCH=amd64 go build ...
+GOOS ?=
+GOARCH ?=
+
 build:
-	cd tools\knowledge && set GOOS=$(GOOS)&& set GOARCH=$(GOARCH)&& go build -o knowledge-$(GOOS)-$(GOARCH)$(EXT) .
+	cd tools/knowledge && GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o knowledge-$(GOOS)-$(GOARCH)$(if $(filter windows,$(GOOS)),.exe,) .
 
 # ---- 快捷跨平台 ----
 build-linux:
-	$(MAKE) build GOOS=linux GOARCH=amd64
+	cd tools/knowledge && GOOS=linux GOARCH=amd64 go build -o knowledge-linux-amd64 .
 
 build-darwin:
-	$(MAKE) build GOOS=darwin GOARCH=amd64
+	cd tools/knowledge && GOOS=darwin GOARCH=amd64 go build -o knowledge-darwin-amd64 .
 
 build-win:
-	$(MAKE) build GOOS=windows GOARCH=amd64
+	cd tools/knowledge && GOOS=windows GOARCH=amd64 go build -o knowledge-windows-amd64.exe .
 
 # ---- 测试与检查 ----
 test-knowledge:
-	cd tools\knowledge && go test -v -cover .
+	cd tools/knowledge && go test -v -cover .
 
 vet-knowledge:
-	cd tools\knowledge && go vet ./...
+	cd tools/knowledge && go vet ./...
+
+fmt:
+	cd tools/knowledge && gofmt -w . && gofmt -l .
 
 # ---- 清理 ----
 clean:
-	-del /Q tools\knowledge\knowledge.exe 2>nul
-	-del /Q tools\knowledge\knowledge-*.exe 2>nul
-	-del /Q tools\knowledge\knowledge-* 2>nul
+	rm -f tools/knowledge/knowledge.exe
+	rm -f tools/knowledge/knowledge-*

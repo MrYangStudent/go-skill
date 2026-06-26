@@ -72,6 +72,9 @@ func FindUser(id string) (*User, error) {
 ### 2.1 Goroutine Panic 防护（🔴 紧急）
 
 ```go
+// import "runtime/debug"
+import "runtime/debug"
+
 // ✓ 正确：添加 recover 防护
 go func() {
     defer func() {

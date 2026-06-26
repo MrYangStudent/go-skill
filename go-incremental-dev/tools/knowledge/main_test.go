@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -252,5 +253,203 @@ result := service.FindUser(id)
 	// 检查文件路径
 	if entries[0].FilePath != filePath {
 		t.Errorf("entry[0].FilePath = %q; want %q", entries[0].FilePath, filePath)
+	}
+}
+
+// -------- updateIndex --------
+
+func Test_updateIndex_NormalCase(t *testing.T) {
+	dir := t.TempDir()
+	idxContent := "# Knowledge Index\n\n> 最后更新: 2026-06-24\n\n| 条目 | 标签 | 来源 | 更新日期 |\n|------|------|------|------|\n| OldFunc | util | pkg/old.go | 2026-06-24 |\n"
+
+	if err := os.WriteFile(filepath.Join(dir, indexFile), []byte(idxContent), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	updateIndex(dir, "NewFunc", "http", "pkg/new.go", "2026-06-26")
+
+	got, err := os.ReadFile(filepath.Join(dir, indexFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	content := string(got)
+
+	if !strings.Contains(content, "最后更新: 2026-06-26") {
+		t.Error("date not updated")
+	}
+	if !strings.Contains(content, "OldFunc") {
+		t.Error("OldFunc row lost")
+	}
+	if !strings.Contains(content, "NewFunc") {
+		t.Error("NewFunc row missing")
+	}
+	// 验证表头分隔行在
+	if !strings.Contains(content, "|------|------|------|------|") {
+		t.Errorf("TABLE SEPARATOR MISSING, got:\n%s", content)
+	}
+}
+
+func Test_updateIndex_NoTable(t *testing.T) {
+	dir := t.TempDir()
+	idxContent := "# Some File\n\nJust some text, no table here.\n"
+
+	if err := os.WriteFile(filepath.Join(dir, indexFile), []byte(idxContent), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	updateIndex(dir, "Func", "tag", "pkg/f.go", "2026-06-26")
+
+	got, err := os.ReadFile(filepath.Join(dir, indexFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	content := string(got)
+
+	if !strings.Contains(content, "Func | tag | pkg/f.go | 2026-06-26") {
+		t.Errorf("New row should be appended, got:\n%s", content)
+	}
+}
+
+// -------- loadAllEntries --------
+
+func Test_loadAllEntries(t *testing.T) {
+	dir := t.TempDir()
+	kbPath := filepath.Join(dir, kbDirName)
+	if err := os.MkdirAll(kbPath, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	// 写 INDEX.md（应被加载时跳过）
+	if err := os.WriteFile(filepath.Join(kbPath, indexFile), []byte("# INDEX"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	// 写一个知识文件
+	content := `<!-- id: entry-a -->
+## [util] FuncA - 功能A
+
+**标签**: util
+**来源**: pkg/a.go
+**更新**: 2026-06-25
+**用途**: 功能A的描述
+
+---
+`
+	if err := os.WriteFile(filepath.Join(kbPath, "common-utils.md"), []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	// 切换到临时目录（loadAllEntries 使用 "." 路径）
+	origDir, _ := os.Getwd()
+	_ = os.Chdir(dir)
+	defer os.Chdir(origDir) //nolint:errcheck
+
+	entries, err := loadAllEntries()
+	if err != nil {
+		t.Fatalf("loadAllEntries() error = %v", err)
+	}
+
+	if len(entries) != 1 {
+		t.Fatalf("loadAllEntries() = %d entries; want 1", len(entries))
+	}
+
+	if entries[0].Title != "FuncA - 功能A" {
+		t.Errorf("entry.Title = %q; want %q", entries[0].Title, "FuncA - 功能A")
+	}
+	if entries[0].Source != "pkg/a.go" {
+		t.Errorf("entry.Source = %q; want %q", entries[0].Source, "pkg/a.go")
+	}
+}
+
+// -------- parseEntries Edge Cases --------
+
+func Test_parseEntries_NoID(t *testing.T) {
+	// 没有 <!-- id: --> 的条目通过 ## 标题隐式开始
+	content := `## [search] FindUser - 查找用户
+
+**标签**: search
+**来源**: service/user.go
+**更新**: 2026-06-24
+**用途**: 描述
+
+---
+`
+	dir := t.TempDir()
+	p := filepath.Join(dir, "test.md")
+	if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	entries, err := parseEntries(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 1 {
+		t.Fatalf("got %d entries; want 1", len(entries))
+	}
+	if entries[0].Title != "FindUser - 查找用户" {
+		t.Errorf("Title = %q", entries[0].Title)
+	}
+	if entries[0].ID != "" {
+		t.Errorf("ID should be empty, got %q", entries[0].ID)
+	}
+}
+
+func Test_parseEntries_EmptyFile(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "test.md")
+	if err := os.WriteFile(p, []byte(""), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	entries, err := parseEntries(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 0 {
+		t.Fatalf("got %d entries; want 0", len(entries))
+	}
+}
+
+func Test_parseEntries_MultipleEntriesWithoutID(t *testing.T) {
+	content := `## [a] FuncA - 第一
+
+**标签**: a
+**来源**: a.go
+**更新**: 2026-06-01
+**用途**: aaa
+
+---
+
+## [b] FuncB - 第二
+
+**标签**: b
+**来源**: b.go
+**更新**: 2026-06-02
+**用途**: bbb
+
+---
+`
+	dir := t.TempDir()
+	p := filepath.Join(dir, "test.md")
+	if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	entries, err := parseEntries(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(entries) != 2 {
+		t.Fatalf("got %d entries; want 2", len(entries))
+	}
+
+	e1, e2 := entries[0], entries[1]
+	if e1.Title != "FuncA - 第一" || e2.Title != "FuncB - 第二" {
+		t.Errorf("titles: %q, %q; want %q, %q", e1.Title, e2.Title, "FuncA - 第一", "FuncB - 第二")
+	}
+	if e1.Source != "a.go" || e2.Source != "b.go" {
+		t.Errorf("sources: %q, %q; want %q, %q", e1.Source, e2.Source, "a.go", "b.go")
 	}
 }

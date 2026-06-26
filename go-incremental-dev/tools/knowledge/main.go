@@ -18,6 +18,9 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -76,6 +79,8 @@ func main() {
 		runCheckStale(args)
 	case "reindex":
 		runReindex()
+	case "scan":
+		runScan(args)
 	case "help", "--help", "-h":
 		printUsage()
 	default:
@@ -85,6 +90,7 @@ func main() {
 	}
 }
 
+// printUsage 输出命令帮助信息.
 func printUsage() {
 	fmt.Print(`Knowledge — 知识库管理工具
 
@@ -97,11 +103,13 @@ func printUsage() {
   knowledge list --stale <项目目录> 列出过时条目
   knowledge check-stale <项目目录>  检查并报告过期条目
   knowledge reindex                 从内容文件重建 INDEX.md
+  knowledge scan [目录...]           扫描项目代码提取可导出函数
 `)
 }
 
 // ---------- init ----------
 
+// runInit 初始化 project-knowledge/ 目录并创建 INDEX.md.
 func runInit(args []string) {
 	dir := filepath.Join(".", kbDirName)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
@@ -134,6 +142,7 @@ func runInit(args []string) {
 
 // ---------- reindex ----------
 
+// runReindex 从 project-knowledge/ 下的内容文件重建 INDEX.md.
 func runReindex() {
 	entries, err := loadAllEntries()
 	if err != nil {
@@ -167,8 +176,116 @@ func runReindex() {
 	fmt.Printf("✅ INDEX.md 已重建（共 %d 条）: %s\n", len(entries), indexPath)
 }
 
+// ---------- scan ----------
+
+// scanCandidate 表示从代码中扫描出的候选知识条目.
+type scanCandidate struct {
+	Name    string // 函数名
+	Doc     string // GoDoc 注释
+	Pkg     string // 所在包名
+	File    string // 文件路径
+}
+
+// runScan 扫描指定目录中的 Go 代码，提取导出函数/类型作为候选知识条目.
+func runScan(args []string) {
+	dirs := args
+	if len(dirs) == 0 {
+		dirs = []string{".", "pkg", "internal"}
+	}
+
+	// 收集候选
+	var candidates []scanCandidate
+	fset := token.NewFileSet()
+	for _, dir := range dirs {
+		if info, err := os.Stat(dir); err != nil || !info.IsDir() {
+			continue // 不存在或不是目录则跳过
+		}
+		filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+			if err != nil || d.IsDir() || !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+				return nil
+			}
+			f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
+			if err != nil {
+				return nil // 跳过无法解析的文件
+			}
+			for _, decl := range f.Decls {
+				fn, ok := decl.(*ast.FuncDecl)
+				if !ok || !fn.Name.IsExported() {
+					continue
+				}
+				// 跳过 main/init
+				if fn.Name.Name == "main" || fn.Name.Name == "init" {
+					continue
+				}
+				doc := ""
+				if fn.Doc != nil {
+					doc = strings.TrimSpace(fn.Doc.Text())
+				}
+				candidates = append(candidates, scanCandidate{
+					Name: fn.Name.Name,
+					Doc:  doc,
+					Pkg:  f.Name.Name,
+					File: path,
+				})
+			}
+			return nil
+		})
+	}
+
+	if len(candidates) == 0 {
+		fmt.Println("🔍 未找到可导出的函数或类型。")
+		return
+	}
+
+	// 加载已有条目，用于去重
+	existing := make(map[string]bool)
+	if entries, err := loadAllEntries(); err == nil {
+		for _, e := range entries {
+			existing[e.Title] = true
+		}
+	}
+
+	// 过滤并输出
+	newCount := 0
+	for _, c := range candidates {
+		title := c.Name
+		if c.Doc != "" {
+			// 用 GoDoc 首行作为简述
+			shortDesc := c.Doc
+			if idx := strings.Index(shortDesc, "\n"); idx > 0 {
+				shortDesc = shortDesc[:idx]
+			}
+			title = fmt.Sprintf("[%s] %s - %s", c.Pkg, c.Name, shortDesc)
+		}
+		if existing[title] || existing[c.Name] {
+			continue // 已存在，跳过
+		}
+		newCount++
+		fmt.Printf("  📦 建议添加:\n")
+		fmt.Printf("     knowledge add -t %q -s %q -p %q\n", title, c.File, firstLine(c.Doc))
+		fmt.Println()
+	}
+
+	if newCount == 0 {
+		fmt.Println("✅ 所有导出函数已存在于知识库，无需新增。")
+	} else {
+		fmt.Printf("📊 共发现 %d 个新候选条目（共扫描 %d 个导出函数）。\n", newCount, len(candidates))
+		fmt.Println("💡 复制上方 knowledge add 命令执行即可保存。")
+	}
+}
+
+// firstLine 返回文本的第一行，如为空则返回空字符串.
+func firstLine(s string) string {
+	s = strings.TrimSpace(s)
+	if idx := strings.IndexByte(s, '\n'); idx >= 0 {
+		return s[:idx]
+	}
+	return s
+}
+
 // ---------- add ----------
 
+// runAdd 交互式或命令行方式添加知识条目到知识库.
 func runAdd(args []string) {
 	title := ""
 	source := ""
@@ -290,6 +407,7 @@ func runAdd(args []string) {
 	fmt.Printf("✅ 已保存条目: %s → %s\n", title, filePath)
 }
 
+// extractTags 从 "[tag1, tag2] Title" 格式的标题中提取标签列表.
 func extractTags(title string) []string {
 	re := regexp.MustCompile(`\[([^\]]+)\]`)
 	matches := re.FindStringSubmatch(title)
@@ -302,6 +420,7 @@ func extractTags(title string) []string {
 	return nil
 }
 
+// updateIndex 将新增条目的摘要信息追加到 INDEX.md 索引表中.
 func updateIndex(kbDir, title, tags, source, date string) {
 	indexPath := filepath.Join(kbDir, indexFile)
 	data, err := os.ReadFile(indexPath)
@@ -343,7 +462,9 @@ func updateIndex(kbDir, title, tags, source, date string) {
 		lines = newLines
 	}
 
-	_ = os.WriteFile(indexPath, []byte(strings.Join(lines, "\n")), 0o644)
+	if err := os.WriteFile(indexPath, []byte(strings.Join(lines, "\n")), 0o644); err != nil {
+		fmt.Fprintf(os.Stderr, "警告: 更新索引文件失败: %v\n", err)
+	}
 }
 
 // sanitizeFileName 将标签转为安全的文件名（去特殊字符、小写、空格转下划线）.
@@ -367,6 +488,7 @@ func sanitizeFileName(tag string) string {
 
 // ---------- search ----------
 
+// runSearch 全文搜索知识库，按相关性排序输出匹配条目.
 func runSearch(args []string) {
 	if len(args) == 0 {
 		fmt.Fprintln(os.Stderr, "❌ 请指定搜索关键词")
@@ -414,6 +536,7 @@ func runSearch(args []string) {
 	}
 }
 
+// scoreEntry 对知识条目按关键词进行加权评分。（标题30 > 标签8 > 用途5 > 来源3 > 示例2）.
 func scoreEntry(e Entry, keyword string) int {
 	score := 0
 	kw := strings.ToLower(keyword)
@@ -453,6 +576,7 @@ func scoreEntry(e Entry, keyword string) int {
 
 // ---------- list ----------
 
+// runList 列出知识库中所有条目，支持 --stale 过滤过时条目.
 func runList(args []string) {
 	checkStale := false
 	var projectDir string
@@ -490,6 +614,7 @@ func runList(args []string) {
 
 // ---------- check-stale ----------
 
+// runCheckStale 对比知识条目来源文件的修改时间，报告过期条目.
 func runCheckStale(args []string) {
 	if len(args) == 0 {
 		fmt.Fprintln(os.Stderr, "❌ 请指定项目代码目录路径")
@@ -531,6 +656,7 @@ func runCheckStale(args []string) {
 	}
 }
 
+// checkEntryFreshness 对比条目来源文件的修改时间与记录日期，返回时效状态字符串.
 func checkEntryFreshness(e Entry, projectDir string) string {
 	if e.Source == "" || e.Source == "-" {
 		return fmt.Sprintf("✅ %s 无来源文件，持保留", e.Title)
@@ -558,6 +684,7 @@ func checkEntryFreshness(e Entry, projectDir string) string {
 
 // ---------- 知识库加载 ----------
 
+// loadAllEntries 遍历 project-knowledge/ 目录，解析所有 .md 文件并返回条目列表.
 func loadAllEntries() ([]Entry, error) {
 	kbDir := filepath.Join(".", kbDirName)
 	if _, err := os.Stat(kbDir); os.IsNotExist(err) {
@@ -588,6 +715,7 @@ func loadAllEntries() ([]Entry, error) {
 	return entries, nil
 }
 
+// parseEntries 解析单个 .md 知识文件，提取所有结构化 Entry.
 func parseEntries(path string) ([]Entry, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
