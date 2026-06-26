@@ -1,0 +1,57 @@
+# ===================== Python =====================
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+.venv/
+venv/
+env/
+
+# ===================== Go =====================
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+vendor/
+
+# ===================== Node.js =====================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===================== Database =====================
+*.db
+*.sqlite
+*.sqlite3
+
+# ===================== IDE & Editors =====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ===================== OS Files =====================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===================== Output & Generated =====================
+output/
+
+# ===================== Environment & Config =====================
+.env
+.env.local
+.env.*.local
+*.log
