@@ -4,6 +4,7 @@ description: >
   Go 语言错误处理审查技能。当用户要求审查代码错误处理、检查 error 使用、
   或请求诊断 panic/忽略错误等问题时触发。专门用于发现和修复 Go 代码中
   的错误处理缺陷，遵循"错误是值"哲学。
+  集成 Go Minimal Code 原则：审查错误处理的同时识别过度工程（未请求的抽象、冗余包装）。
 triggers:
   - 错误处理审查
   - 检查 error
@@ -11,6 +12,8 @@ triggers:
   - 错误处理审查员
   - 检查 panic
   - 检查错误包装
+  - 过度工程审查
+  - go-minimal-code
 ---
 
 # 错误处理审查员 (Error Handling Reviewer)
@@ -18,6 +21,64 @@ triggers:
 ## 技能定位
 
 Go 语言错误处理专家，遵循 "errors are values" 哲学。检测代码中的错误处理问题并提供修复建议。
+集成 **Go Minimal Code 行为矫正**：在审查错误处理的同时，识别过度工程（未请求的抽象、冗余包装、推测性错误处理）。
+
+## Go Minimal Code 集成：过度工程审查
+
+审查错误处理时，同时检查以下 Go Minimal Code 原则：
+
+### 1. YAGNI 错误处理
+```go
+// 🔴 过度设计：未请求的错误类型层次
+type AppError struct {
+    Code    int
+    Message string
+    Cause   error
+}
+
+// ✅ Go Minimal Code 建议：先用标准 error，需要时再扩展
+return fmt.Errorf("user not found: %w", err)
+```
+
+### 2. 错误包装深度限制
+```go
+// 🔴 过度包装：嵌套 5 层，难以调试
+return fmt.Errorf("handler: %w",
+    fmt.Errorf("service: %w",
+        fmt.Errorf("repository: %w",
+            fmt.Errorf("validate: %w", err))))
+
+// ✅ Go Minimal Code 建议：一层包装 + 上下文
+return fmt.Errorf("handleUserRequest: %w", err)
+```
+
+### 3. 删除冗余错误转换
+```go
+// 🔴 不必要的错误转换
+if err != nil {
+    return ErrBusinessFailure  // 丢失原始错误信息
+}
+
+// ✅ Go Minimal Code 建议：保留错误链
+if err != nil {
+    return fmt.Errorf("business logic failed: %w", err)
+}
+```
+
+### 4. 标准化错误处理模式
+```go
+// 🔴 多种错误处理方式并存（增加维护成本）
+- 有些函数用 panic
+- 有些用 error return
+- 有些用回调
+
+// ✅ Go Minimal Code 建议：统一模式
+func Process() error {  // 统一返回 error
+    if err != nil {
+        return fmt.Errorf("process: %w", err)  // 统一包装
+    }
+}
+```
 
 ## 审查检查项
 
