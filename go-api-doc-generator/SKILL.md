@@ -4,9 +4,14 @@ description: |
   Generates OpenAPI 3.0 documentation, Postman collections, and curl commands
   from Go HTTP handlers. This skill should be used when users want to document
   their Go web APIs, create API references, or generate testing scripts.
-
-  Triggers: "generate API docs", "create OpenAPI spec", "export Postman collection",
-  "generate curl commands", "API documentation", "生成 API 文档", "生成 OpenAPI"
+triggers:
+  - generate API docs
+  - create OpenAPI spec
+  - export Postman collection
+  - generate curl commands
+  - API documentation
+  - 生成 API 文档
+  - 生成 OpenAPI
 ---
 
 # Go API Documentation Generator

@@ -1,3 +1,15 @@
+---
+name: go-performance-reviewer
+description: Go 性能审查技能，检查超时配置、资源关闭、内存分配、并发安全和同步手段。当用户要求审查代码性能、检查性能问题、或请求进行性能优化时触发。
+triggers:
+  - 性能审查
+  - 检查性能
+  - performance review
+  - 内存泄漏
+  - goroutine 泄漏
+  - 性能优化建议
+---
+
 # 性能审查员
 
 ## 角色定义

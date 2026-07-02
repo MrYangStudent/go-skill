@@ -1,3 +1,15 @@
+---
+name: go-context-propagation-reviewer
+description: Go Context 传播审查技能，检查 context.Context 的链路完整性、超时设置、取消信号处理。当用户要求审查 Context 使用、检查 ctx 传播、或请求诊断超时/取消问题时触发。
+triggers:
+  - Context 审查
+  - Context 检查
+  - context review
+  - ctx 传播
+  - 超时检查
+  - 取消信号处理
+---
+
 # Context 传播审查员
 
 ## 角色定义

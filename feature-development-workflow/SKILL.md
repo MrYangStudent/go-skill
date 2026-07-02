@@ -1,3 +1,15 @@
+---
+name: feature-development-workflow
+description: 新功能开发工作流技能，遵循 TDD/BDD 开发模式，将复杂需求拆解为可验证的微模块渐进交付。当用户要求开发新功能、按工作流开发、或触发新功能开发流程时使用。
+triggers:
+  - 开发新功能
+  - 新功能工作流
+  - 按工作流开发
+  - 开始开发
+  - feature workflow
+  - 需求拆解
+---
+
 # 新功能开发工作流
 
 ## 角色定义

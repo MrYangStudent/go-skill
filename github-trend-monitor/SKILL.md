@@ -1,3 +1,17 @@
+---
+name: github-trend-monitor
+description: GitHub Trending 趋势监控技能，自动抓取趋势项目、AI 生成简报、邮件推送日报、星标激增检测和可视化仪表盘。当用户要求监控 GitHub 趋势、生成趋势日报、分析技术趋势或配置趋势告警时触发。
+triggers:
+  - GitHub Trending
+  - 趋势监控
+  - 趋势日报
+  - 趋势简报
+  - github trend
+  - 趋势分析
+  - 星标激增
+  - GitHub 趋势
+---
+
 # GitHub Trending 趋势监控技能
 
 > 自动抓取 GitHub Trending → AI 分析生成简报 → 邮件推送日报 → 可视化仪表盘
@@ -322,18 +336,18 @@ Register-ScheduledTask -TaskName "GitHubTrend" -Trigger $trigger -Action $action
 
 ## 参考代码
 
-参考代码位于 `references/` 目录：
+参考代码位于 `reference/` 目录：
 
 | 文件 | 说明 |
 |------|------|
-| `references/tracker.py` | 爬虫核心实现 |
-| `references/summarizer.py` | AI 简报生成 |
-| `references/sender.py` | 邮件发送 |
-| `references/alert_on_spike.py` | 激增检测 |
-| `references/tech_stack_analyzer.py` | 技术栈分析 |
-| `references/chart_generator.py` | 图表生成 |
-| `references/trend_dashboard_builder.py` | 仪表盘构建 |
-| `references/secrets.py` | 密钥管理 |
+| `reference/tracker.py` | 爬虫核心实现 |
+| `reference/summarizer.py` | AI 简报生成 |
+| `reference/sender.py` | 邮件发送 |
+| `reference/alert_on_spike.py` | 激增检测 |
+| `reference/tech_stack_analyzer.py` | 技术栈分析 |
+| `reference/chart_generator.py` | 图表生成 |
+| `reference/trend_dashboard_builder.py` | 仪表盘构建 |
+| `reference/secrets.py` | 密钥管理 |
 
 ## 故障排查
 

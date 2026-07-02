@@ -1,3 +1,14 @@
+---
+name: go-dependency-reviewer
+description: Go 依赖管理审查技能，检查第三方依赖的必要性、安全性、版本锁定和传递依赖，集成 Go Minimal Code YAGNI 原则。当用户要求审查依赖、检查 go.mod、或请求进行依赖安全审查时触发。
+triggers:
+  - 审查依赖
+  - 依赖检查
+  - 检查 go.mod
+  - 依赖安全
+  - dependency review
+---
+
 # 依赖管理审查员
 
 ## 角色定义

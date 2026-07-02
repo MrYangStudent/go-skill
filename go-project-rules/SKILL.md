@@ -1,3 +1,15 @@
+---
+name: go-project-rules
+description: Go 项目治理规则，管理对话初始化、进度同步、README 联动、提交前一致性检查和 AI 行为自检。当用户要求初始化项目、同步进度、检查 README 一致性、或触发项目规则检查时使用。
+triggers:
+  - 初始化项目
+  - 同步进度
+  - 检查 README
+  - 完成阶段
+  - project rules
+  - 项目规则
+---
+
 # Go 项目治理规则
 
 ## 角色定义

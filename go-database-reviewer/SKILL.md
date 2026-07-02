@@ -1,3 +1,15 @@
+---
+name: go-database-reviewer
+description: Go 数据库审查技能，检查连接池配置、事务处理、查询效率、资源关闭和 SQL 注入防护。当用户要求审查数据库代码、检查 SQL 性能、或请求进行数据库审查时触发。
+triggers:
+  - 数据库审查
+  - SQL 检查
+  - database review
+  - 连接池配置
+  - N+1 查询
+  - 事务检查
+---
+
 # 数据库审查员
 
 ## 角色定义

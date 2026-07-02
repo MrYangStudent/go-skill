@@ -1,3 +1,15 @@
+---
+name: go-api-design-reviewer
+description: Go API 设计审查技能，专注于审查 RESTful API 的设计质量和规范性。当用户要求审查 API 设计、检查接口规范、或请求进行 API 审查时触发。
+triggers:
+  - API 设计审查
+  - API 检查
+  - api review
+  - RESTful 检查
+  - 接口规范
+  - HTTP 状态码
+---
+
 # API 设计审查员
 
 ## 角色定义
