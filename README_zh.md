@@ -1,4 +1,4 @@
-# Go 工程技能库 (go-skill)
+﻿# Go 工程技能库 (go-skill)
 
 一套完整的 Go 语言工程实践技能集，覆盖从代码开发、测试、质量审查到文档生成的完整开发生命周期。
 
@@ -35,7 +35,7 @@
 
 | 技能 | 名称 | 描述 |
 |------|------|------|
-| [test-generator](./test-generator/) | 测试生成专员 | 单元测试、并发测试、边界测试、Mock 编写 |
+| [go-test-generator](./go-test-generator/) | 测试生成专员 | 单元测试、并发测试、边界测试、Mock 编写 |
 
 ### 工具函数封装
 
@@ -47,21 +47,21 @@
 
 | 技能 | 名称 | 描述 |
 |------|------|------|
-| [error-handling-reviewer](./error-handling-reviewer/) | 错误处理审查员 | error 包装检查、panic 防护、参数校验审计 |
+| [go-error-handling-reviewer](./go-error-handling-reviewer/) | 错误处理审查员 | error 包装检查、panic 防护、参数校验审计 |
 | [go-concurrency-reviewer](./go-concurrency-reviewer/) | Go 并发审查员 | race condition 检测、goroutine 泄漏防护、channel 安全 |
-| [dependency-reviewer](./dependency-reviewer/) | 依赖管理审查员 | 第三方依赖必要性、安全性、版本锁定审查 |
-| [performance-reviewer](./performance-reviewer/) | 性能审查员 | 超时设置、资源关闭、内存分配、sync.Pool |
-| [security-reviewer](./security-reviewer/) | 安全审查员 | 敏感信息、SQL 注入、命令注入、依赖漏洞 |
-| [database-reviewer](./database-reviewer/) | 数据库审查员 | 连接池、事务处理、查询效率、N+1 检测 |
-| [logging-reviewer](./logging-reviewer/) | 日志规范审查员 | 日志级别、脱敏处理、结构化日志、上下文 |
-| [context-propagation-reviewer](./context-propagation-reviewer/) | Context 传播审查员 | 链路完整性、超时设置、取消信号、Header 传播 |
-| [api-design-reviewer](./api-design-reviewer/) | API 设计审查员 | RESTful 规范、HTTP 语义、命名一致性、版本控制 |
+| [go-dependency-reviewer](./go-dependency-reviewer/) | 依赖管理审查员 | 第三方依赖必要性、安全性、版本锁定审查 |
+| [go-performance-reviewer](./go-performance-reviewer/) | 性能审查员 | 超时设置、资源关闭、内存分配、sync.Pool |
+| [go-security-reviewer](./go-security-reviewer/) | 安全审查员 | 敏感信息、SQL 注入、命令注入、依赖漏洞 |
+| [go-database-reviewer](./go-database-reviewer/) | 数据库审查员 | 连接池、事务处理、查询效率、N+1 检测 |
+| [go-logging-reviewer](./go-logging-reviewer/) | 日志规范审查员 | 日志级别、脱敏处理、结构化日志、上下文 |
+| [go-context-propagation-reviewer](./go-context-propagation-reviewer/) | Context 传播审查员 | 链路完整性、超时设置、取消信号、Header 传播 |
+| [go-api-design-reviewer](./go-api-design-reviewer/) | API 设计审查员 | RESTful 规范、HTTP 语义、命名一致性、版本控制 |
 
 ### 文档生成
 
 | 技能 | 名称 | 描述 |
 |------|------|------|
-| [doc-generator](./doc-generator/) | 文档生成器 | GoDoc 注释、README、AI 友好示例块 |
+| [go-doc-generator](./go-doc-generator/) | 文档生成器 | GoDoc 注释、README、AI 友好示例块 |
 | [go-api-doc-generator](./go-api-doc-generator/) | API 文档生成器 | OpenAPI 3.0 规范、Postman 集合、curl 命令 |
 
 ### 通用工具
@@ -94,7 +94,7 @@
 │                      阶段一：准备与文档                           │
 ├─────────────────────────────────────────────────────────────────┤
 │  feature-development-workflow  →  需求澄清、任务拆解             │
-│  doc-generator                 →  项目结构、模块文档               │
+│  go-doc-generator                 →  项目结构、模块文档               │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
@@ -111,7 +111,7 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                      阶段三：测试生成                             │
 ├─────────────────────────────────────────────────────────────────┤
-│  test-generator                                                 │
+│  go-test-generator                                                 │
 │  - 正常路径测试                                                  │
 │  - 边界情况测试                                                  │
 │  - 错误路径测试                                                  │
@@ -121,15 +121,15 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                      阶段四：质量审查                             │
 ├─────────────────────────────────────────────────────────────────┤
-│  error-handling-reviewer     →  错误处理                         │
+│  go-error-handling-reviewer     →  错误处理                         │
 │  go-concurrency-reviewer     →  并发安全                         │
-│  dependency-reviewer         →  依赖管理                         │
-│  performance-reviewer        →  性能表现                         │
-│  security-reviewer           →  安全漏洞                         │
-│  database-reviewer            →  数据库操作                       │
-│  logging-reviewer             →  日志规范                         │
-│  context-propagation-reviewer →  Context 链路                    │
-│  api-design-reviewer         →  API 设计                         │
+│  go-dependency-reviewer         →  依赖管理                         │
+│  go-performance-reviewer        →  性能表现                         │
+│  go-security-reviewer           →  安全漏洞                         │
+│  go-database-reviewer            →  数据库操作                       │
+│  go-logging-reviewer             →  日志规范                         │
+│  go-context-propagation-reviewer →  Context 链路                    │
+│  go-api-design-reviewer         →  API 设计                         │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
@@ -197,31 +197,31 @@
 
 ```bash
 # 错误处理审查
-error-handling-reviewer
+go-error-handling-reviewer
 
 # 并发安全审查
 go-concurrency-reviewer
 
 # 性能审查
-performance-reviewer
+go-performance-reviewer
 
 # 安全审查
-security-reviewer
+go-security-reviewer
 
 # 依赖审查
-dependency-reviewer
+go-dependency-reviewer
 
 # 数据库审查
-database-reviewer
+go-database-reviewer
 
 # 日志审查
-logging-reviewer
+go-logging-reviewer
 
 # Context 审查
-context-propagation-reviewer
+go-context-propagation-reviewer
 
 # API 设计审查
-api-design-reviewer
+go-api-design-reviewer
 ```
 
 #### 3. 测试生成
@@ -264,9 +264,9 @@ api-design-reviewer
 整合 13 个专项技能的全链路开发流程：
 
 - 阶段零：项目治理（go-project-rules）
-- 阶段一：准备与文档（feature-development-workflow, doc-generator）
+- 阶段一：准备与文档（feature-development-workflow, go-doc-generator）
 - 阶段二：代码实现（遵循开发规范）
-- 阶段三：测试生成（test-generator）
+- 阶段三：测试生成（go-test-generator）
 - 阶段四：质量审查（9 个审查技能）
 - 阶段五：文档生成（go-api-doc-generator）
 - 阶段六：验证与部署（编译、测试、启动、验证）
@@ -280,7 +280,7 @@ api-design-reviewer
 - 设计阶段输出模板
 - 集成与验证（go vet、go test -race、go build）
 
-### test-generator
+### go-test-generator
 
 测试生成专员，生成高质量、可维护的测试套件：
 
@@ -294,19 +294,19 @@ api-design-reviewer
 
 | 技能 | 审查范围 |
 |------|----------|
-| error-handling-reviewer | error 检查、panic 防护、参数校验 |
+| go-error-handling-reviewer | error 检查、panic 防护、参数校验 |
 | go-concurrency-reviewer | race condition、goroutine 泄漏、channel 安全 |
-| dependency-reviewer | 必要性、标准库替代、版本锁定、漏洞扫描 |
-| performance-reviewer | 超时、资源关闭、内存分配、sync.Pool |
-| security-reviewer | 敏感信息、注入防护、认证授权、漏洞扫描 |
-| database-reviewer | 连接池、事务、N+1 查询、索引 |
-| logging-reviewer | 日志级别、脱敏、结构化、上下文 |
-| context-propagation-reviewer | 链路完整性、超时、取消信号、Header 传播 |
-| api-design-reviewer | RESTful、状态码、命名一致性、版本控制 |
+| go-dependency-reviewer | 必要性、标准库替代、版本锁定、漏洞扫描 |
+| go-performance-reviewer | 超时、资源关闭、内存分配、sync.Pool |
+| go-security-reviewer | 敏感信息、注入防护、认证授权、漏洞扫描 |
+| go-database-reviewer | 连接池、事务、N+1 查询、索引 |
+| go-logging-reviewer | 日志级别、脱敏、结构化、上下文 |
+| go-context-propagation-reviewer | 链路完整性、超时、取消信号、Header 传播 |
+| go-api-design-reviewer | RESTful、状态码、命名一致性、版本控制 |
 
 ### 文档生成技能
 
-#### doc-generator
+#### go-doc-generator
 
 文档生成器，生成 AI 友好的技术文档：
 

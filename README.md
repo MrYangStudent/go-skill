@@ -1,4 +1,4 @@
-# Go Engineering Skills (go-skill)
+﻿# Go Engineering Skills (go-skill)
 
 A comprehensive Go language engineering skill set covering the complete development lifecycle from code development, testing, quality review to documentation generation.
 
@@ -43,7 +43,7 @@ A comprehensive Go language engineering skill set covering the complete developm
 
 | Skill | Name | Description |
 |-------|------|-------------|
-| [test-generator](./test-generator/) | Test Generator | Unit tests, concurrency tests, edge cases, Mock writing |
+| [go-test-generator](./go-test-generator/) | Test Generator | Unit tests, concurrency tests, edge cases, Mock writing |
 
 ### Utility Functions
 
@@ -55,21 +55,21 @@ A comprehensive Go language engineering skill set covering the complete developm
 
 | Skill | Name | Description |
 |-------|------|-------------|
-| [error-handling-reviewer](./error-handling-reviewer/) | Error Handling Reviewer | error wrapping checks, panic protection, parameter validation audit |
+| [go-error-handling-reviewer](./go-error-handling-reviewer/) | Error Handling Reviewer | error wrapping checks, panic protection, parameter validation audit |
 | [go-concurrency-reviewer](./go-concurrency-reviewer/) | Go Concurrency Reviewer | race condition detection, goroutine leak protection, channel safety |
-| [dependency-reviewer](./dependency-reviewer/) | Dependency Reviewer | third-party dependency necessity, security, version pinning review |
-| [performance-reviewer](./performance-reviewer/) | Performance Reviewer | timeout settings, resource closure, memory allocation, sync.Pool |
-| [security-reviewer](./security-reviewer/) | Security Reviewer | sensitive data, SQL/command injection, dependency vulnerabilities |
-| [database-reviewer](./database-reviewer/) | Database Reviewer | connection pool, transaction handling, query efficiency, N+1 detection |
-| [logging-reviewer](./logging-reviewer/) | Logging Reviewer | log levels, sanitization, structured logging, context |
-| [context-propagation-reviewer](./context-propagation-reviewer/) | Context Propagation Reviewer | chain completeness, timeout settings, cancellation, header propagation |
-| [api-design-reviewer](./api-design-reviewer/) | API Design Reviewer | RESTful compliance, HTTP semantics, naming consistency, versioning |
+| [go-dependency-reviewer](./go-dependency-reviewer/) | Dependency Reviewer | third-party dependency necessity, security, version pinning review |
+| [go-performance-reviewer](./go-performance-reviewer/) | Performance Reviewer | timeout settings, resource closure, memory allocation, sync.Pool |
+| [go-security-reviewer](./go-security-reviewer/) | Security Reviewer | sensitive data, SQL/command injection, dependency vulnerabilities |
+| [go-database-reviewer](./go-database-reviewer/) | Database Reviewer | connection pool, transaction handling, query efficiency, N+1 detection |
+| [go-logging-reviewer](./go-logging-reviewer/) | Logging Reviewer | log levels, sanitization, structured logging, context |
+| [go-context-propagation-reviewer](./go-context-propagation-reviewer/) | Context Propagation Reviewer | chain completeness, timeout settings, cancellation, header propagation |
+| [go-api-design-reviewer](./go-api-design-reviewer/) | API Design Reviewer | RESTful compliance, HTTP semantics, naming consistency, versioning |
 
 ### Documentation Generation
 
 | Skill | Name | Description |
 |-------|------|-------------|
-| [doc-generator](./doc-generator/) | Documentation Generator | GoDoc comments, README, AI-friendly example blocks |
+| [go-doc-generator](./go-doc-generator/) | Documentation Generator | GoDoc comments, README, AI-friendly example blocks |
 | [go-api-doc-generator](./go-api-doc-generator/) | API Documentation Generator | OpenAPI 3.0 specs, Postman collections, curl commands |
 
 ### General Tools
@@ -102,7 +102,7 @@ A comprehensive Go language engineering skill set covering the complete developm
 │                      Stage 1: Preparation & Documentation       │
 ├─────────────────────────────────────────────────────────────────┤
 │  feature-development-workflow  →  Requirements clarification   │
-│  doc-generator                 →  Project structure, docs       │
+│  go-doc-generator                 →  Project structure, docs       │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
@@ -119,7 +119,7 @@ A comprehensive Go language engineering skill set covering the complete developm
 ┌─────────────────────────────────────────────────────────────────┐
 │                      Stage 3: Test Generation                   │
 ├─────────────────────────────────────────────────────────────────┤
-│  test-generator                                                 │
+│  go-test-generator                                                 │
 │  - Happy path tests                                             │
 │  - Edge case tests                                              │
 │  - Error path tests                                             │
@@ -129,15 +129,15 @@ A comprehensive Go language engineering skill set covering the complete developm
 ┌─────────────────────────────────────────────────────────────────┐
 │                      Stage 4: Quality Review                    │
 ├─────────────────────────────────────────────────────────────────┤
-│  error-handling-reviewer     →  Error handling                  │
+│  go-error-handling-reviewer     →  Error handling                  │
 │  go-concurrency-reviewer     →  Concurrency safety              │
-│  dependency-reviewer         →  Dependency management           │
-│  performance-reviewer        →  Performance                     │
-│  security-reviewer           →  Security                        │
-│  database-reviewer            →  Database operations            │
-│  logging-reviewer            →  Logging standards               │
-│  context-propagation-reviewer→  Context propagation             │
-│  api-design-reviewer         →  API design                      │
+│  go-dependency-reviewer         →  Dependency management           │
+│  go-performance-reviewer        →  Performance                     │
+│  go-security-reviewer           →  Security                        │
+│  go-database-reviewer            →  Database operations            │
+│  go-logging-reviewer            →  Logging standards               │
+│  go-context-propagation-reviewer→  Context propagation             │
+│  go-api-design-reviewer         →  API design                      │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
@@ -205,31 +205,31 @@ Execute quality reviews as needed:
 
 ```bash
 # Error handling review
-error-handling-reviewer
+go-error-handling-reviewer
 
 # Concurrency safety review
 go-concurrency-reviewer
 
 # Performance review
-performance-reviewer
+go-performance-reviewer
 
 # Security review
-security-reviewer
+go-security-reviewer
 
 # Dependency review
-dependency-reviewer
+go-dependency-reviewer
 
 # Database review
-database-reviewer
+go-database-reviewer
 
 # Logging review
-logging-reviewer
+go-logging-reviewer
 
 # Context review
-context-propagation-reviewer
+go-context-propagation-reviewer
 
 # API design review
-api-design-reviewer
+go-api-design-reviewer
 ```
 
 #### 3. Test Generation
@@ -288,7 +288,7 @@ Feature development workflow following TDD/BDD patterns:
 - Design phase output templates
 - Integration and verification
 
-### test-generator
+### go-test-generator
 
 Test generation specialist:
 
@@ -302,19 +302,19 @@ Test generation specialist:
 
 | Skill | Coverage |
 |-------|----------|
-| error-handling-reviewer | error checks, panic protection, parameter validation |
+| go-error-handling-reviewer | error checks, panic protection, parameter validation |
 | go-concurrency-reviewer | race condition, goroutine leak, channel safety |
-| dependency-reviewer | necessity, stdlib alternatives, version pinning, vulnerabilities |
-| performance-reviewer | timeout, resource closure, memory allocation, sync.Pool |
-| security-reviewer | sensitive data, injection protection, auth, vulnerabilities |
-| database-reviewer | connection pool, transactions, N+1 queries, indexes |
-| logging-reviewer | log levels, sanitization, structured logging, context |
-| context-propagation-reviewer | chain completeness, timeout, cancellation, header propagation |
-| api-design-reviewer | RESTful, status codes, naming consistency, versioning |
+| go-dependency-reviewer | necessity, stdlib alternatives, version pinning, vulnerabilities |
+| go-performance-reviewer | timeout, resource closure, memory allocation, sync.Pool |
+| go-security-reviewer | sensitive data, injection protection, auth, vulnerabilities |
+| go-database-reviewer | connection pool, transactions, N+1 queries, indexes |
+| go-logging-reviewer | log levels, sanitization, structured logging, context |
+| go-context-propagation-reviewer | chain completeness, timeout, cancellation, header propagation |
+| go-api-design-reviewer | RESTful, status codes, naming consistency, versioning |
 
 ### Documentation Skills
 
-#### doc-generator
+#### go-doc-generator
 
 AI-friendly technical documentation:
 

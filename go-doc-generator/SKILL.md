@@ -1,5 +1,5 @@
 ---
-name: doc-generator
+name: go-doc-generator
 description: >
   技术文档生成技能。当用户要求为代码生成文档、编写 GoDoc 注释、创建 README、
   或请求生成 AI 友好的使用示例时触发。专门用于生成对 AI 工具（如 Cline、Cursor）

@@ -1,4 +1,4 @@
-# Go 完整开发工作流
+﻿# Go 完整开发工作流
 
 ## 角色定义
 
@@ -20,19 +20,19 @@
 | 阶段 | 技能 | 职责 |
 |------|------|------|
 | 治理 | `go-project-rules` | 初始化、进度同步、README 联动 |
-| 文档 | `doc-generator` | 项目文档、GoDoc 注释 |
+| 文档 | `go-doc-generator` | 项目文档、GoDoc 注释 |
 | 开发 | `feature-development-workflow` | 需求拆解、TDD 开发 |
 | 开发 | `go-utility-functions` | 通用工具函数封装（HTTP、签名、加密、排序、时间、泛型转换等） |
-| 测试 | `test-generator` | 单元测试、Mock 编写 |
-| 代码审查 | `error-handling-reviewer` | 错误处理审查 |
+| 测试 | `go-test-generator` | 单元测试、Mock 编写 |
+| 代码审查 | `go-error-handling-reviewer` | 错误处理审查 |
 | 代码审查 | `go-concurrency-reviewer` | 并发安全审查 |
-| 代码审查 | `dependency-reviewer` | 依赖管理审查 |
-| 代码审查 | `performance-reviewer` | 性能审查 |
-| 代码审查 | `security-reviewer` | 安全审查 |
-| 代码审查 | `database-reviewer` | 数据库审查 |
-| 代码审查 | `logging-reviewer` | 日志规范审查 |
-| 代码审查 | `context-propagation-reviewer` | Context 传播审查 |
-| 代码审查 | `api-design-reviewer` | API 设计审查 |
+| 代码审查 | `go-dependency-reviewer` | 依赖管理审查 |
+| 代码审查 | `go-performance-reviewer` | 性能审查 |
+| 代码审查 | `go-security-reviewer` | 安全审查 |
+| 代码审查 | `go-database-reviewer` | 数据库审查 |
+| 代码审查 | `go-logging-reviewer` | 日志规范审查 |
+| 代码审查 | `go-context-propagation-reviewer` | Context 传播审查 |
+| 代码审查 | `go-api-design-reviewer` | API 设计审查 |
 | 文档 | `go-api-doc-generator` | OpenAPI 文档生成 |
 
 ---
@@ -55,7 +55,7 @@
 │                      阶段一：准备与文档                           │
 ├─────────────────────────────────────────────────────────────────┤
 │  feature-development-workflow  →  需求澄清、任务拆解             │
-│  doc-generator                 →  项目结构、模块文档               │
+│  go-doc-generator                 →  项目结构、模块文档               │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
@@ -72,7 +72,7 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                      阶段三：测试生成                             │
 ├─────────────────────────────────────────────────────────────────┤
-│  test-generator                                                 │
+│  go-test-generator                                                 │
 │  - 正常路径测试                                                  │
 │  - 边界情况测试                                                  │
 │  - 错误路径测试                                                  │
@@ -82,15 +82,15 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                      阶段四：质量审查                             │
 ├─────────────────────────────────────────────────────────────────┤
-│  error-handling-reviewer     →  错误处理                         │
+│  go-error-handling-reviewer     →  错误处理                         │
 │  go-concurrency-reviewer     →  并发安全                         │
-│  dependency-reviewer         →  依赖管理                         │
-│  performance-reviewer        →  性能表现                         │
-│  security-reviewer           →  安全漏洞                         │
-│  database-reviewer           →  数据库操作                       │
-│  logging-reviewer            →  日志规范                         │
-│  context-propagation-reviewer→  Context 链路                    │
-│  api-design-reviewer         →  API 设计                         │
+│  go-dependency-reviewer         →  依赖管理                         │
+│  go-performance-reviewer        →  性能表现                         │
+│  go-security-reviewer           →  安全漏洞                         │
+│  go-database-reviewer           →  数据库操作                       │
+│  go-logging-reviewer            →  日志规范                         │
+│  go-context-propagation-reviewer→  Context 链路                    │
+│  go-api-design-reviewer         →  API 设计                         │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐

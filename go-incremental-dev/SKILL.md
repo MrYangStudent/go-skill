@@ -1,4 +1,4 @@
----
+﻿---
 name: go-incremental-dev
 description: >
   Go 增量开发工作流，专为在大型项目中新增功能设计。
@@ -444,17 +444,17 @@ func Add(a, b int) int {
 
 | 阶段 | 调用技能 | 目的 |
 |------|----------|------|
-| 编码后 → 测试前 | `test-generator` | 为新代码生成 table-driven tests |
-| 测试后 → 审查前 | `error-handling-reviewer` | 审查新代码的错误处理是否规范 |
+| 编码后 → 测试前 | `go-test-generator` | 为新代码生成 table-driven tests |
+| 测试后 → 审查前 | `go-error-handling-reviewer` | 审查新代码的错误处理是否规范 |
 | 审查前 | `go-concurrency-reviewer` | 涉及 goroutine 时审查并发安全 |
-| 审查前 | `performance-reviewer` | 审查热路径性能问题 |
-| 审查前 | `security-reviewer` | 审查安全漏洞（注入、敏感信息） |
-| 审查前 | `logging-reviewer` | 审查日志级别和脱敏 |
-| 审查前 | `api-design-reviewer` | 审查 API 端点设计 |
-| 集成后 | `doc-generator` | 生成模块文档和注释 |
+| 审查前 | `go-performance-reviewer` | 审查热路径性能问题 |
+| 审查前 | `go-security-reviewer` | 审查安全漏洞（注入、敏感信息） |
+| 审查前 | `go-logging-reviewer` | 审查日志级别和脱敏 |
+| 审查前 | `go-api-design-reviewer` | 审查 API 端点设计 |
+| 集成后 | `go-doc-generator` | 生成模块文档和注释 |
 | 集成后 | `go-api-doc-generator` | 生成 OpenAPI 文档 |
 
-> 使用方式：完成增量编码后，根据变更类型选择对应审查技能。例如新增了 API 端点，则依次调用 `api-design-reviewer` → `error-handling-reviewer` → `go-api-doc-generator`。
+> 使用方式：完成增量编码后，根据变更类型选择对应审查技能。例如新增了 API 端点，则依次调用 `go-api-design-reviewer` → `go-error-handling-reviewer` → `go-api-doc-generator`。
 
 ---
 

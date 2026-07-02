@@ -1,5 +1,5 @@
 ---
-name: test-generator
+name: go-test-generator
 description: >
   Go 测试生成技能。当用户要求为代码生成测试、编写单元测试、创建 test 文件、
   或请求生成 table-driven tests 时触发。专门用于生成完整的、可运行的测试套件，

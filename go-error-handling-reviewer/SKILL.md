@@ -1,5 +1,5 @@
 ---
-name: error-handling-reviewer
+name: go-error-handling-reviewer
 description: >
   Go 语言错误处理审查技能。当用户要求审查代码错误处理、检查 error 使用、
   或请求诊断 panic/忽略错误等问题时触发。专门用于发现和修复 Go 代码中
