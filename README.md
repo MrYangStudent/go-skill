@@ -1,5 +1,7 @@
 ﻿# Go Engineering Skills (go-skill)
 
+[English](./README.md) | [中文](./README_zh.md)
+
 A comprehensive engineering skill set covering the complete development lifecycle from code development, testing, quality review to documentation generation. Includes 24 skills for Go engineering, tooling, and project management.
 
 ## Core Skills
