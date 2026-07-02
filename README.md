@@ -1,33 +1,35 @@
 ﻿# Go Engineering Skills (go-skill)
 
-A comprehensive Go language engineering skill set covering the complete development lifecycle from code development, testing, quality review to documentation generation.
+A comprehensive engineering skill set covering the complete development lifecycle from code development, testing, quality review to documentation generation. Includes 24 skills for Go engineering, tooling, and project management.
 
 ## Core Skills
 
-### go-project-rules
+### go-project-rules / project-rules-init
 
-**Project Governance Rules**, ensuring project consistency, progress visibility, and standards enforcement.
+**Project Governance & Initialization**, establishing entity-driven development to prevent context loss across sessions.
 
 | Skill | Name | Description |
 |-------|------|-------------|
 | [go-project-rules](./go-project-rules/) | Project Governance Rules | progress sync, README sync, commit checks, verification loop |
-| [go-full-dev-workflow](./go-full-dev-workflow/) | Full Development Workflow | Integrates 13 skills for end-to-end development |
+| [go-full-dev-workflow](./go-full-dev-workflow/) | Full Development Workflow | Integrates 14 specialized skills for end-to-end development |
+| [project-rules-init](./project-rules-init/) | Project Rules Initializer | Entity map (ARCHITECTURE.md), progress tracking (progress.md), rule self-check |
+
+### context-compressor / github-trend-monitor
+
+**Context Compression & Trend Monitoring**, intelligent context compression and GitHub trend tracking.
+
+| Skill | Name | Description |
+|-------|------|-------------|
+| [context-compressor](./context-compressor/) | Context Compressor | Content-type aware compression, tiered hot/cold storage, session stats |
+| [github-trend-monitor](./github-trend-monitor/) | GitHub Trend Monitor | Trend scraping, AI brief generation, email reporting, spike detection |
 
 ### prompt-master
 
-**Prompt Master**, a conversational prompt engineering skill based on Andrew Ng's AI Prompting for Everyone course.
+**Prompt Master**, structured prompt engineering based on Andrew Ng's course.
 
 | Skill | Name | Description |
 |-------|------|-------------|
 | [prompt-master](./prompt-master/) | Prompt Master | Conversational prompt construction, optimization, and templates |
-
-### context-compressor
-
-**Context Compressor**, intelligent tool output and conversation context compression to reduce token costs.
-
-| Skill | Name | Description |
-|-------|------|-------------|
-| [context-compressor](./context-compressor/) | Context Compressor | Smart compression with content-type detection, specialized strategies, and tiered hot/cold storage |
 
 ## Complete Skills List
 
@@ -37,6 +39,7 @@ A comprehensive Go language engineering skill set covering the complete developm
 |-------|------|-------------|
 | [go-project-rules](./go-project-rules/) | Project Governance Rules | progress sync, README sync, commit checks, verification loop |
 | [go-full-dev-workflow](./go-full-dev-workflow/) | Full Development Workflow | Requirements → Implementation → Testing → Review → Documentation → Verification |
+| [go-incremental-dev](./go-incremental-dev/) | Incremental Development | Incremental iteration from requirements to implementation, context protection, feature manifest |
 | [feature-development-workflow](./feature-development-workflow/) | Feature Development Workflow | Requirements analysis, TDD/BDD, micro-module iterative delivery |
 
 ### Test Generation
@@ -50,6 +53,7 @@ A comprehensive Go language engineering skill set covering the complete developm
 | Skill | Name | Description |
 |-------|------|-------------|
 | [go-utility-functions](./go-utility-functions/) | Go Utility Functions | HTTP client, signing, crypto, sorting, time formatting, generic slice/map conversion, pagination, retry |
+| [go-minimal-code](./go-minimal-code/) | Code Minimalizer | YAGNI principle enforcement, over-engineering detection, stdlib-first |
 
 ### Code Review
 
@@ -72,15 +76,26 @@ A comprehensive Go language engineering skill set covering the complete developm
 | [go-doc-generator](./go-doc-generator/) | Documentation Generator | GoDoc comments, README, AI-friendly example blocks |
 | [go-api-doc-generator](./go-api-doc-generator/) | API Documentation Generator | OpenAPI 3.0 specs, Postman collections, curl commands |
 
+### Project Management & Tools
+
+| Skill | Name | Description |
+|-------|------|-------------|
+| [project-rules-init](./project-rules-init/) | Project Rules Initializer | Language detection, entity map generation (ARCHITECTURE.md), progress tracking (progress.md), rule self-check |
+| [skill-auditor](./skill-auditor/) | Skill Auditor | Skill compliance checking, frontmatter validation, naming convention audit |
+| [skill-sync-manager](./skill-sync-manager/) | Skill Sync Manager | Auto-enable/disable skills based on project language |
+
 ### General Tools
 
 | Skill | Name | Description |
 |-------|------|-------------|
 | [context-compressor](./context-compressor/) | Context Compressor | Intelligent tool output and conversation compression, tiered hot/cold storage, 7 content types detection |
+| [github-trend-monitor](./github-trend-monitor/) | GitHub Trend Monitor | Auto-scrape trending repos, AI-generated briefs, email daily reports, star spike detection |
+| [prompt-master](./prompt-master/) | Prompt Master | Six-step structured framework, brainstorming, AI review, writing workflow |
 
 ## Features
 
 - **Full Lifecycle Coverage**: Requirements analysis → Code implementation → Test verification → Quality review → Documentation → Deployment
+- **Entity-Driven Development**: ARCHITECTURE.md tracks every module/function's purpose and description, preventing context loss across sessions
 - **AI-Friendly**: All documentation includes AI-Usage comment blocks for Cline/Cursor tool learning
 - **Zero External Dependencies**: Uses only Go standard library
 - **Strict Standards**: Follows Go official best practices (gofmt, go vet, race detector)
@@ -92,9 +107,10 @@ A comprehensive Go language engineering skill set covering the complete developm
 ┌─────────────────────────────────────────────────────────────────┐
 │                      Stage 0: Project Governance                │
 ├─────────────────────────────────────────────────────────────────┤
-│  go-project-rules                                               │
-│  - Session initialization (read README.md, project.md)           │
-│  - Progress sync (project.md kanban management)                 │
+│  project-rules-init (first run) / go-project-rules               │
+│  - Project init: generate entity map + progress tracking + rules │
+│  - Session init: read ARCHITECTURE.md & progress.md to restore   │
+│  - Progress sync (progress.md entity kanban)                     │
 │  - Architecture sync (README.md updates)                        │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
@@ -164,17 +180,29 @@ A comprehensive Go language engineering skill set covering the complete developm
 
 ### 1. Project Initialization
 
-Use `go-project-rules` for project initialization:
+First run `project-rules-init` to establish the project governance foundation:
 
 ```
-"initialize project"
+"initialize project rules"
+"project rules init"
+"set up entity map"
+```
+
+Automatically generates:
+- ARCHITECTURE.md — defines every module/function's purpose by development phase
+- progress.md — entity-level progress tracking and change log
+- `.codebuddy/rules/` — three RULE.mdc governance files
+
+Subsequent sessions use `go-project-rules` for ongoing governance:
+
+```
 "sync progress"
 "project rules"
 ```
 
 First-time use automatically loads governance rules:
-- Read README.md to understand project architecture
-- Read project.md to understand current progress
+- Read ARCHITECTURE.md to restore entity awareness
+- Read progress.md to understand current progress
 - Confirm next steps
 
 ### 2. Use Full Workflow
@@ -191,12 +219,13 @@ Execute the complete development workflow with one command:
 
 #### 1. Develop New Features
 
-Use `feature-development-workflow`:
+Use `feature-development-workflow` for new features, or `go-incremental-dev` for incremental iterations:
 
 ```
 "develop new feature"
 "feature workflow"
 "start development"
+"incremental dev"
 ```
 
 #### 2. Code Review
@@ -258,8 +287,8 @@ Generate API documentation:
 
 Project governance rules ensuring consistency:
 
-- **Rule 1**: Session initialization (read README.md, project.md)
-- **Rule 2**: Progress sync (project.md kanban)
+- **Rule 1**: Session initialization (read ARCHITECTURE.md, progress.md)
+- **Rule 2**: Progress sync (progress.md entity kanban)
 - **Rule 3**: Architecture changes sync with README
 - **Rule 4**: README consistency check before commit
 - **Rule 5**: Full workflow after phase completion
@@ -269,17 +298,26 @@ Project governance rules ensuring consistency:
 
 #### go-full-dev-workflow
 
-Integrates 13 specialized skills for end-to-end development:
+Integrates 14 specialized skills for end-to-end development, organized by stages:
 
 - Stage 0: Project Governance (go-project-rules)
-- Stage 1: Preparation & Documentation
+- Stage 1: Preparation & Documentation (feature-development-workflow, go-doc-generator)
 - Stage 2: Code Implementation
-- Stage 3: Test Generation
+- Stage 3: Test Generation (go-test-generator)
 - Stage 4: Quality Review (9 review skills)
-- Stage 5: Documentation Generation
+- Stage 5: Documentation Generation (go-api-doc-generator)
 - Stage 6: Verification & Deployment
 
-### feature-development-workflow
+#### go-incremental-dev
+
+Incremental development workflow for large-scale projects:
+
+- Context protection: prevents forgetting implemented features across sessions
+- Feature manifest: tracks every implemented module's interface and purpose
+- Rollback safety: each step can revert to the last runnable state
+- Change summary: outputs per-stage change summary
+
+#### feature-development-workflow
 
 Feature development workflow following TDD/BDD patterns:
 
@@ -297,6 +335,15 @@ Test generation specialist:
 - Error path tests
 - Concurrency safety tests
 - Mock object writing
+
+### go-minimal-code
+
+Code Minimalizer, enforcing YAGNI principles:
+
+- Over-engineering detection: identify unnecessary abstraction layers and interfaces
+- Stdlib-first: prefer standard library over third-party dependencies
+- Lazy initialization: load on demand instead of preloading
+- Dead code cleanup: identify unused exports and functions
 
 ### Code Review Skills
 
@@ -331,6 +378,55 @@ API documentation generator:
 - Postman Collection v2.1
 - curl command examples
 - Supports gorilla/mux, chi, Gin, net/http
+
+### Project Management & Tools
+
+#### project-rules-init
+
+Project Rules Initializer, establishing entity-driven development:
+
+- Language/framework auto-detection (Go/Python/Node.js)
+- Generates ARCHITECTURE.md entity map (defines every module/function's purpose by phase)
+- Generates progress.md progress tracking (entity-level status, change log, blockers)
+- Generates three RULE.mdc files under `.codebuddy/rules/` (project rules + phase rules + skills manifest)
+- Rule self-check (8 checks: architecture file, progress file, phase definitions, entity traceability, skill coverage, etc.)
+- **Core goal**: prevent context loss when AI sessions restart during multi-phase development
+
+#### prompt-master
+
+Prompt Master, based on Andrew Ng's AI Prompting for Everyone:
+
+- Six-step structured framework: Role → Background → Purpose → Constraints → Output → Examples
+- Brainstorming, AI review, writing workflow
+- Sycophancy awareness and mitigation
+- Image generation prompt optimization
+
+#### github-trend-monitor
+
+GitHub Trending Monitor:
+
+- Auto-scrape GitHub Trending repositories
+- AI-generated daily/weekly technology briefs
+- Email delivery for daily and weekly reports
+- Star spike detection and alerting
+- Tech stack analysis and visualization dashboard
+
+#### skill-auditor
+
+Skill compliance auditing tool:
+
+- Checks SKILL.md format: YAML frontmatter, name/description/triggers completeness
+- Checks manifest.json structure consistency
+- Checks skill directory naming conventions (language prefix, path standards)
+- Outputs audit report (pass/warning/failed)
+
+#### skill-sync-manager
+
+Skill synchronization manager:
+
+- Auto-enable/disable skills based on the current project's programming language
+- Integrated via SessionStart hook ensures skills are always correct when switching projects
+- Supports prefix-matching rules (e.g., go- prefix matches Go projects)
 
 ### General Tools
 

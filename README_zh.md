@@ -1,25 +1,35 @@
-﻿# Go 工程技能库 (go-skill)
+﻿# 工程技能库 (Skill Hub)
 
-一套完整的 Go 语言工程实践技能集，覆盖从代码开发、测试、质量审查到文档生成的完整开发生命周期。
+覆盖 Go 语言工程实践、通用开发工具和项目管理的一站式技能集。包含代码开发、测试、质量审查、文档生成、项目初始化和趋势监控等 24 个技能。
 
 ## 核心技能
 
-### go-project-rules
+### go-project-rules / project-rules-init
 
-**项目治理规则**，确保项目一致性、进度可视化和规范执行。
+**项目治理规则与初始化**，建立实体驱动开发机制，确保项目一致性、进度可视化和规范执行。
 
 | 技能 | 名称 | 描述 |
 |------|------|------|
 | [go-project-rules](./go-project-rules/) | 项目治理规则 | 进度同步、README 联动、提交检查、验证闭环 |
-| [go-full-dev-workflow](./go-full-dev-workflow/) | 完整开发工作流 | 整合 14 个技能的全链路开发流程 |
+| [go-full-dev-workflow](./go-full-dev-workflow/) | 完整开发工作流 | 整合 14 个专项技能的端到端开发流程 |
+| [project-rules-init](./project-rules-init/) | 项目规则初始化器 | 实体地图 (ARCHITECTURE.md)、进度追踪 (progress.md)、规则自检 |
 
-### context-compressor
+### context-compressor / github-trend-monitor
 
-**上下文压缩技能**，智能压缩工具输出和对话上下文以降低 token 消耗。
+**上下文压缩与趋势监控**，智能压缩对话上下文和跟踪 GitHub 技术趋势。
 
 | 技能 | 名称 | 描述 |
 |------|------|------|
 | [context-compressor](./context-compressor/) | 上下文压缩 | 内容类型感知压缩、三级热/冷存储、会话统计 |
+| [github-trend-monitor](./github-trend-monitor/) | GitHub 趋势监控 | 趋势抓取、AI 简报生成、邮件推送、激增检测 |
+
+### prompt-master
+
+**提示词大师**，基于吴恩达课程的结构化提示词工程。
+
+| 技能 | 名称 | 描述 |
+|------|------|------|
+| [prompt-master](./prompt-master/) | 提示词大师 | 对话式提示词构建、优化与模板 |
 
 ## 完整技能列表
 
@@ -29,6 +39,7 @@
 |------|------|------|
 | [go-project-rules](./go-project-rules/) | 项目治理规则 | 进度同步、README 联动、提交检查、验证闭环 |
 | [go-full-dev-workflow](./go-full-dev-workflow/) | 完整开发工作流 | 需求 → 实现 → 测试 → 审查 → 文档 → 验证 |
+| [go-incremental-dev](./go-incremental-dev/) | 增量开发工作流 | 从需求到实现的增量迭代、上下文保护、已实现功能清单 |
 | [feature-development-workflow](./feature-development-workflow/) | 新功能开发工作流 | 需求拆解、TDD/BDD 开发、微模块迭代交付 |
 
 ### 测试生成
@@ -42,6 +53,7 @@
 | 技能 | 名称 | 描述 |
 |------|------|------|
 | [go-utility-functions](./go-utility-functions/) | 通用工具函数 | HTTP 客户端、签名、加密、排序、时间格式化、泛型切片/Map 转换、分页、重试 |
+| [go-minimal-code](./go-minimal-code/) | 代码极简器 | YAGNI 原则执行、过度设计检测、标准库优先 |
 
 ### 代码审查
 
@@ -64,15 +76,26 @@
 | [go-doc-generator](./go-doc-generator/) | 文档生成器 | GoDoc 注释、README、AI 友好示例块 |
 | [go-api-doc-generator](./go-api-doc-generator/) | API 文档生成器 | OpenAPI 3.0 规范、Postman 集合、curl 命令 |
 
+### 项目管理与工具
+
+| 技能 | 名称 | 描述 |
+|------|------|------|
+| [project-rules-init](./project-rules-init/) | 项目规则初始化器 | 语言检测、实体地图生成 (ARCHITECTURE.md)、进度追踪 (progress.md)、规则自检 |
+| [skill-auditor](./skill-auditor/) | 技能审核员 | 技能合规性检查、frontmatter 验证、命名规范审计 |
+| [skill-sync-manager](./skill-sync-manager/) | 技能同步管理器 | 按项目语言自动启停匹配技能 |
+
 ### 通用工具
 
 | 技能 | 名称 | 描述 |
 |------|------|------|
 | [context-compressor](./context-compressor/) | 上下文压缩 | 智能内容压缩，7 种类型检测、三级热/冷存储、8 个 MCP 工具 |
+| [github-trend-monitor](./github-trend-monitor/) | GitHub 趋势监控 | 自动抓取趋势项目、AI 生成简报、邮件推送日报、星标激增检测 |
+| [prompt-master](./prompt-master/) | 提示词大师 | 六步结构化框架、头脑风暴、AI 审查、写作工作流 |
 
 ## 核心特性
 
 - **全链路覆盖**：从需求分析 → 代码实现 → 测试验证 → 质量审查 → 文档沉淀 → 生产部署
+- **实体驱动开发**：ARCHITECTURE.md 记录每个模块/函数的主体和功能描述，防止会话重启后遗忘
 - **AI 友好**：所有文档包含 AI-Usage 注释块，支持 Cline/Cursor 等工具学习
 - **零外部依赖**：仅使用 Go 标准库，无需引入额外包
 - **严格规范**：遵循 Go 官方最佳实践（gofmt、go vet、race detector）
@@ -84,10 +107,11 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                      阶段零：项目治理                            │
 ├─────────────────────────────────────────────────────────────────┤
-│  go-project-rules                                               │
-│  - 对话初始化（读取 README.md、project.md）                      │
-│  - 进度同步（project.md 看板管理）                                │
-│  - 架构联动（README.md 同步更新）                                 │
+│  project-rules-init (首次) / go-project-rules                     │
+│  - 项目初始化：生成实体地图 + 进度追踪 + 规则文件                     │
+│  - 对话初始化：读取 ARCHITECTURE.md 和 progress.md 恢复认知          │
+│  - 进度同步：progress.md 实体看板管理                               │
+│  - 架构联动：README.md 同步更新                                     │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
@@ -156,18 +180,25 @@
 
 ### 1. 项目初始化
 
-使用 `go-project-rules` 进行项目初始化：
+首次使用 `project-rules-init` 建立项目治理基础：
 
 ```
-"初始化项目"
+"初始化项目规则"
+"project rules init"
+"建立实体地图"
+```
+
+自动生成：
+- ARCHITECTURE.md — 按阶段定义每个模块/函数的主体和功能
+- progress.md — 实体级进度追踪和变更日志
+- `.codebuddy/rules/` — 三个 RULE.mdc 规则文件
+
+后续每次会话使用 `go-project-rules` 维持治理规则：
+
+```
 "同步进度"
 "project rules"
 ```
-
-首次使用自动加载项目治理规则：
-- 读取 README.md 了解项目架构
-- 读取 project.md 了解当前进度
-- 确认下一步工作
 
 ### 2. 使用完整工作流
 
@@ -183,12 +214,13 @@
 
 #### 1. 开发新功能
 
-使用 `feature-development-workflow` 启动新功能开发流程：
+使用 `feature-development-workflow` 启动新功能开发，或使用 `go-incremental-dev` 进行增量迭代：
 
 ```
 "开发新功能"
 "新功能工作流"
 "开始开发"
+"增量开发"
 ```
 
 #### 2. 代码审查
@@ -250,8 +282,8 @@ go-api-design-reviewer
 
 项目治理规则，确保项目一致性：
 
-- **规则 1**：对话启动强制初始化（读取 README.md、project.md）
-- **规则 2**：项目进度强制同步（project.md 看板）
+- **规则 1**：对话启动强制初始化（读取 ARCHITECTURE.md、progress.md）
+- **规则 2**：项目进度强制同步（progress.md 实体看板）
 - **规则 3**：架构变更与 README 联动
 - **规则 4**：提交前 README 一致性检查
 - **规则 5**：阶段完成后的全流程工作流
@@ -261,7 +293,7 @@ go-api-design-reviewer
 
 #### go-full-dev-workflow
 
-整合 13 个专项技能的全链路开发流程：
+整合 14 个专项技能的端到端开发流程，按阶段串联：
 
 - 阶段零：项目治理（go-project-rules）
 - 阶段一：准备与文档（feature-development-workflow, go-doc-generator）
@@ -271,7 +303,16 @@ go-api-design-reviewer
 - 阶段五：文档生成（go-api-doc-generator）
 - 阶段六：验证与部署（编译、测试、启动、验证）
 
-### feature-development-workflow
+#### go-incremental-dev
+
+增量开发工作流，适配大型项目的渐进式开发：
+
+- 上下文保护：防止会话重启后遗忘已实现功能
+- 功能清单追踪：记录每个已实现模块的接口和功能
+- 回退安全：每步可回退到上一个可运行状态
+- 变更摘要：每阶段输出变更摘要
+
+#### feature-development-workflow
 
 新功能开发工作流，遵循 TDD/BDD 模式：
 
@@ -289,6 +330,15 @@ go-api-design-reviewer
 - 错误路径测试
 - 并发安全测试（兼容 `go test -race`）
 - Mock 对象编写
+
+### go-minimal-code
+
+代码极简器，强制执行 YAGNI 原则：
+
+- 过度设计检测：识别不必要的抽象层和接口
+- 标准库优先：能用标准库就不引入第三方依赖
+- 惰性初始化：按需加载而非预加载
+- 死代码清理：识别未使用的导出和函数
 
 ### 代码审查技能
 
@@ -323,6 +373,55 @@ API 文档生成器，从 Go HTTP handler 生成完整文档：
 - Postman Collection v2.1
 - curl 命令示例
 - 支持 gorilla/mux、chi、Gin、net/http
+
+### 项目管理与工具
+
+#### project-rules-init
+
+项目规则初始化器，建立实体驱动开发机制：
+
+- 语言/框架自动检测（Go/Python/Node.js）
+- 生成 ARCHITECTURE.md 实体地图（按阶段定义每个模块的主体和功能描述）
+- 生成 progress.md 进度追踪（实体级状态、变更日志、阻塞项）
+- 在 `.codebuddy/rules/` 下生成三个 RULE.mdc（项目规则 + 阶段流程 + 技能清单）
+- 规则自检（8 项检查：架构文件、进度文件、阶段定义、实体可追溯、技能覆盖等）
+- **核心目标**：解决多阶段开发中 AI 会话重启后的上下文遗忘问题
+
+#### prompt-master
+
+提示词大师，基于吴恩达 AI Prompting for Everyone 课程：
+
+- 六步结构化框架：角色→背景→目的→约束→输出格式→示例
+- 头脑风暴、AI 审查、写作工作流
+- 迎合性（Sycophancy）认知与应对
+- 图像生成 Prompt 优化
+
+#### github-trend-monitor
+
+GitHub Trending 趋势监控：
+
+- 自动抓取 GitHub Trending 趋势项目
+- AI 生成每日/每周技术简报
+- 邮件推送日报和周报
+- 星标激增检测与告警
+- 技术栈分析可视化仪表盘
+
+#### skill-auditor
+
+技能合规性审核工具：
+
+- 检查 SKILL.md 格式：YAML frontmatter、name/description/triggers 完整性
+- 检查 manifest.json 结构一致性
+- 检查技能目录命名规范（语言前缀、路径规范）
+- 输出审核报告（pass/warning/failed）
+
+#### skill-sync-manager
+
+技能同步管理器：
+
+- 按项目语言自动启用/停用匹配的技能
+- 通过 SessionStart hook 集成，确保每次会话技能与语言匹配
+- 支持前缀匹配规则（如 go- 前缀匹配 Go 项目）
 
 ### 通用工具
 
