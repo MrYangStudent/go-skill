@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """sync_skills.py — 按项目语言自动启用/禁用对应的 Skills。
 
-在项目根目录放置 `.codebuddy/project-language` (内容为 python/go/unknown)，
+在项目根目录放置 `.codebuddy/project-language` (如 python / go / vue / go, vue / python, vue)，
 运行本脚本即可自动调整用户级 skills 的启用状态。
 
 原理: CodeBuddy SKILL.md 支持 `disable: true` YAML 字段
@@ -22,6 +22,7 @@ USER_SKILLS_DIR = Path.home() / ".codebuddy" / "skills"
 LANG_PREFIX_MAP: dict[str, list[str]] = {
     "python": ["python-"],
     "go": ["go-"],
+    "vue": ["vue-"],
 }
 
 # === 始终启用的语言无关技能 ===
@@ -32,6 +33,7 @@ ALWAYS_ENABLED: set[str] = {
     "project-rules-init",
     "skill-auditor",
     "自己.skill",
+    "skill-sync-manager",
 }
 
 # === 无语言前缀但实际是语言专用的技能 ===
@@ -119,21 +121,31 @@ def _enable_skill_file(skill_md: Path) -> bool:
     return True
 
 
-def detect_language(project_root: Path) -> str:
-    """从 .codebuddy/project-language 或项目文件检测项目语言。"""
+SUPPORTED_LANGS = frozenset({"python", "go", "vue"})
+
+
+def detect_languages(project_root: Path) -> list[str]:
+    """从 .codebuddy/project-language 或项目文件检测项目语言。返回列表以支持多语言项目。"""
     lang_file = project_root / ".codebuddy" / "project-language"
     if lang_file.exists():
-        lang = lang_file.read_text().strip().lower()
-        if lang in ("python", "go"):
-            return lang
+        raw = lang_file.read_text(encoding="utf-8").strip().lower()
+        # 支持逗号分隔、空格分隔、多行
+        candidates = raw.replace("\n", ",").replace(" ", ",").split(",")
+        langs = [l.strip() for l in candidates if l.strip()]
+        valid = [l for l in langs if l in SUPPORTED_LANGS]
+        if valid:
+            return valid
 
-    # 回退：检测项目文件
+    # 回退：检测项目文件（可能多个）
+    detected: list[str] = []
     if (project_root / "go.mod").exists():
-        return "go"
-    if (project_root / "pyproject.toml").exists() or (project_root / "requirements.txt").exists():
-        return "python"
+        detected.append("go")
+    if (project_root / "pyproject.toml").exists() or (
+        project_root / "requirements.txt"
+    ).exists():
+        detected.append("python")
 
-    return "unknown"
+    return detected if detected else ["unknown"]
 
 
 def get_skill_language(skill_name: str) -> Optional[str]:
@@ -150,13 +162,16 @@ def get_skill_language(skill_name: str) -> Optional[str]:
 
 
 def sync_skills(
-    project_root: Path, lang: str, dry_run: bool = False, quiet: bool = False
+    project_root: Path,
+    langs: list[str],
+    dry_run: bool = False,
+    quiet: bool = False,
 ) -> dict:
     """根据项目语言同步 skills 状态。
 
     Args:
         project_root: 项目根目录
-        lang: 目标语言 (python/go)
+        langs: 目标语言列表 (如 ["python", "vue"])
         dry_run: 仅预览不实际修改
         quiet: 静默模式 (hook 调用用，无输出)
 
@@ -188,8 +203,8 @@ def sync_skills(
         if skill_lang is None:
             continue
 
-        # 匹配当前语言的技能 → 确保启用
-        if skill_lang == lang:
+        # 匹配任意项目语言 → 确保启用
+        if skill_lang in langs:
             if not dry_run:
                 changed = _enable_skill_file(skill_md)
             else:
@@ -201,7 +216,7 @@ def sync_skills(
                 result["skipped"].append(skill_name)
             continue
 
-        # 不匹配当前语言的技能 → 禁用
+        # 不匹配任何项目语言 → 禁用
         if not dry_run:
             changed = _disable_skill_file(skill_md)
         else:
@@ -219,8 +234,8 @@ def sync_skills(
 
 def status(project_root: Path) -> None:
     """显示当前 skills 启用/禁用状态。"""
-    lang = detect_language(project_root)
-    print(f"项目语言: {lang}")
+    langs = detect_languages(project_root)
+    print(f"项目语言: {', '.join(langs)}")
     print(f"{'技能名':<40} {'语言':<10} {'状态':<10}")
     print("-" * 60)
 
@@ -279,8 +294,8 @@ def main() -> None:
     if args.action == "enable-all":
         if not args.quiet:
             print("🔧 启用全部 skills...")
-        result = sync_skills(project_root, "python", dry_run=args.dry_run, quiet=args.quiet)
-        result2 = sync_skills(project_root, "go", dry_run=args.dry_run, quiet=args.quiet)
+        result = sync_skills(project_root, ["python"], dry_run=args.dry_run, quiet=args.quiet)
+        result2 = sync_skills(project_root, ["go"], dry_run=args.dry_run, quiet=args.quiet)
         if args.dry_run and not args.quiet:
             print("\n[Dry-run 模式，未实际修改]")
         return
@@ -290,16 +305,16 @@ def main() -> None:
         return
 
     # sync
-    lang = detect_language(project_root)
-    if lang == "unknown":
+    langs = detect_languages(project_root)
+    if "unknown" in langs:
         if not args.quiet:
             print(
                 "❌ 无法检测项目语言。请在 .codebuddy/project-language "
-                "中写入 python 或 go"
+                "中写入 python / go / vue（支持逗号分隔多语言，如 go, vue）"
             )
         sys.exit(0 if args.quiet else 1)
 
-    result = sync_skills(project_root, lang, dry_run=args.dry_run, quiet=args.quiet)
+    result = sync_skills(project_root, langs, dry_run=args.dry_run, quiet=args.quiet)
 
     has_changes = len(result["enabled"]) + len(result["disabled"]) > 0
 
@@ -314,7 +329,7 @@ def main() -> None:
             msg_parts.append(f"禁用 {len(result['disabled'])}")
             msg_parts.append(f"~{len(result['disabled']) * 200}t saved")
         if args.quiet:
-            print(f"[skills-sync] lang={lang} | " + " | ".join(msg_parts))
+            print(f"[skills-sync] langs={','.join(langs)} | " + " | ".join(msg_parts))
         else:
             print(f"\n✅ 完成: " + ", ".join(msg_parts) + f" (跳过 {len(result['skipped'])})")
 
