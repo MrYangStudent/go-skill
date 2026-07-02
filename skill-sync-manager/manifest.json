@@ -1,0 +1,21 @@
+{
+  "name": "skill-sync-manager",
+  "version": "1.0.0",
+  "description": "Automatically enable/disable CodeBuddy skills by project language using prefix-matching rules and YAML frontmatter. Saves ~3,400 tokens per session by disabling irrelevant language skills.",
+  "language": "python",
+  "capabilities": [
+    "skill-management",
+    "language-detection",
+    "yaml-frontmatter-editing",
+    "hook-integration",
+    "pre-commit-hook",
+    "multi-platform-deployment"
+  ],
+  "scripts": {
+    "core": "scripts/sync_skills.py",
+    "installer": "scripts/install.py"
+  },
+  "compatibility": {
+    "python": ">=3.8"
+  }
+}
