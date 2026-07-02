@@ -2,6 +2,11 @@
 
 [English](./README.md) | [中文](./README_zh.md)
 
+<a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License"></a>
+<a href="#complete-skills-list"><img src="https://img.shields.io/badge/skills-24-brightgreen?style=flat-square" alt="Skills"></a>
+<a href="#code-standards"><img src="https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go&style=flat-square" alt="Go Version"></a>
+<a href="https://github.com/MrYangStudent/go-skill"><img src="https://img.shields.io/github/stars/MrYangStudent/go-skill?style=flat-square" alt="Stars"></a>
+
 A comprehensive engineering skill set covering the complete development lifecycle from code development, testing, quality review to documentation generation. Includes 24 skills for Go engineering, tooling, and project management.
 
 ## Core Skills
@@ -93,6 +98,20 @@ A comprehensive engineering skill set covering the complete development lifecycl
 | [context-compressor](./context-compressor/) | Context Compressor | Intelligent tool output and conversation compression, tiered hot/cold storage, 7 content types detection |
 | [github-trend-monitor](./github-trend-monitor/) | GitHub Trend Monitor | Auto-scrape trending repos, AI-generated briefs, email daily reports, star spike detection |
 | [prompt-master](./prompt-master/) | Prompt Master | Six-step structured framework, brainstorming, AI review, writing workflow |
+
+## Installation
+
+This is a CodeBuddy skill collection — clone it to your skills directory:
+
+```bash
+# Clone to CodeBuddy skills directory
+git clone https://github.com/MrYangStudent/go-skill.git ~/.codebuddy/skills/go-skill/
+
+# Or Gitee mirror (China)
+git clone https://gitee.com/mryangsir/go-skill.git ~/.codebuddy/skills/go-skill/
+```
+
+> No `go install` or `npm install` needed. These skills are markdown-based and loaded directly by CodeBuddy.
 
 ## Features
 
@@ -479,6 +498,11 @@ govulncheck ./...
 - Code quality audit and refactoring
 - API documentation automation
 - Team coding standards alignment
+
+## Author
+
+- **GitHub**: [@MrYangStudent](https://github.com/MrYangStudent)
+- **Gitee**: [@mryangsir](https://gitee.com/mryangsir)
 
 ## License
 

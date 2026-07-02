@@ -2,6 +2,11 @@
 
 [English](./README.md) | [中文](./README_zh.md)
 
+<a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License"></a>
+<a href="#完整技能列表"><img src="https://img.shields.io/badge/skills-24-brightgreen?style=flat-square" alt="Skills"></a>
+<a href="#代码规范"><img src="https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go&style=flat-square" alt="Go Version"></a>
+<a href="https://github.com/MrYangStudent/go-skill"><img src="https://img.shields.io/github/stars/MrYangStudent/go-skill?style=flat-square" alt="Stars"></a>
+
 覆盖 Go 语言工程实践、通用开发工具和项目管理的一站式技能集。包含代码开发、测试、质量审查、文档生成、项目初始化和趋势监控等 24 个技能。
 
 ## 核心技能
@@ -93,6 +98,20 @@
 | [context-compressor](./context-compressor/) | 上下文压缩 | 智能内容压缩，7 种类型检测、三级热/冷存储、8 个 MCP 工具 |
 | [github-trend-monitor](./github-trend-monitor/) | GitHub 趋势监控 | 自动抓取趋势项目、AI 生成简报、邮件推送日报、星标激增检测 |
 | [prompt-master](./prompt-master/) | 提示词大师 | 六步结构化框架、头脑风暴、AI 审查、写作工作流 |
+
+## 安装
+
+本仓库为 CodeBuddy 技能集合，克隆到技能目录即可使用：
+
+```bash
+# 克隆到 CodeBuddy skills 目录
+git clone https://github.com/MrYangStudent/go-skill.git ~/.codebuddy/skills/go-skill/
+
+# 或使用 Gitee 镜像（国内推荐）
+git clone https://gitee.com/mryangsir/go-skill.git ~/.codebuddy/skills/go-skill/
+```
+
+> 无需 `go install` 或 `npm install`。这些技能基于 Markdown，由 CodeBuddy 直接加载。
 
 ## 核心特性
 
@@ -476,6 +495,11 @@ govulncheck ./...
 - 代码质量审计与重构
 - API 文档自动化生成
 - 团队编码规范统一
+
+## 作者
+
+- **GitHub**: [@MrYangStudent](https://github.com/MrYangStudent)
+- **Gitee**: [@mryangsir](https://gitee.com/mryangsir)
 
 ## License
 
