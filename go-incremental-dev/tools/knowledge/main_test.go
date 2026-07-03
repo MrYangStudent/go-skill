@@ -453,3 +453,511 @@ func Test_parseEntries_MultipleEntriesWithoutID(t *testing.T) {
 		t.Errorf("sources: %q, %q; want %q, %q", e1.Source, e2.Source, "a.go", "b.go")
 	}
 }
+
+// -------- YAML frontmatter 解析 --------
+
+func Test_parseEntries_YAMLFormat(t *testing.T) {
+	content := `---
+id: entry-yaml-1
+title: "FindUser - 查找用户"
+tags: [search, user]
+source: "service/user.go"
+updated: 2026-06-24
+purpose: "根据 ID 查找用户"
+---
+
+` + "```go" + `
+result := service.FindUser(id)
+` + "```" + `
+
+---
+`
+	dir := t.TempDir()
+	p := filepath.Join(dir, "test.md")
+	if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	entries, err := parseEntries(p)
+	if err != nil {
+		t.Fatalf("parseEntries() error = %v", err)
+	}
+
+	if len(entries) != 1 {
+		t.Fatalf("parseEntries() returned %d entries; want 1", len(entries))
+	}
+
+	e := entries[0]
+	if e.Title != "FindUser - 查找用户" {
+		t.Errorf("entry.Title = %q; want %q", e.Title, "FindUser - 查找用户")
+	}
+	if len(e.Tags) != 2 || e.Tags[0] != "search" || e.Tags[1] != "user" {
+		t.Errorf("entry.Tags = %v; want [search user]", e.Tags)
+	}
+	if e.Source != "service/user.go" {
+		t.Errorf("entry.Source = %q; want %q", e.Source, "service/user.go")
+	}
+	if e.Purpose != "根据 ID 查找用户" {
+		t.Errorf("entry.Purpose = %q; want %q", e.Purpose, "根据 ID 查找用户")
+	}
+	if e.ID != "entry-yaml-1" {
+		t.Errorf("entry.ID = %q; want %q", e.ID, "entry-yaml-1")
+	}
+	if e.Format != "yaml" {
+		t.Errorf("entry.Format = %q; want %q", e.Format, "yaml")
+	}
+	if !stringsContains(e.Example, "service.FindUser") {
+		t.Errorf("entry.Example should contain 'service.FindUser', got: %q", e.Example)
+	}
+}
+
+func Test_parseEntries_MixedFormat(t *testing.T) {
+	// 测试同一个文件中有 Markdown 格式和 YAML 格式条目共存
+	// 注意：YAML 格式条目必须写在文件开头，Markdown 格式条目写在文件后续部分
+	content := `<!-- id: entry-md-1 -->
+## [search] FindUserMD - 查找用户
+
+**标签**: search, user
+**来源**: service/user.go
+**更新**: 2026-06-24
+**用途**: 根据 ID 查找用户
+
+---
+
+`
+	dir := t.TempDir()
+	p := filepath.Join(dir, "test.md")
+	if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	entries, err := parseEntries(p)
+	if err != nil {
+		t.Fatalf("parseEntries() error = %v", err)
+	}
+
+	if len(entries) != 1 {
+		t.Fatalf("parseEntries() returned %d entries; want 1", len(entries))
+	}
+
+	e := entries[0]
+	if e.Format != "markdown" {
+		t.Errorf("entry.Format = %q; want %q", e.Format, "markdown")
+	}
+}
+
+// -------- formatYAMLEntry / formatMarkdownEntry --------
+
+func Test_formatYAMLEntry(t *testing.T) {
+	result := formatYAMLEntry("entry-1", "[search] FindUser", []string{"search", "user"}, "pkg/user.go", "2026-06-25", "查找用户", "user := FindUser(1)", []string{})
+
+	if !strings.Contains(result, "---") {
+		t.Error("YAML entry should contain frontmatter delimiter")
+	}
+	if !strings.Contains(result, "id: entry-1") {
+		t.Error("YAML entry should contain id field")
+	}
+	if !strings.Contains(result, "title: \"FindUser\"") {
+		t.Error("YAML entry should contain title field (without tag prefix)")
+	}
+	if !strings.Contains(result, "tags: [search, user]") {
+		t.Error("YAML entry should contain tags field")
+	}
+	if !strings.Contains(result, "source: \"pkg/user.go\"") {
+		t.Error("YAML entry should contain source field")
+	}
+	if !strings.Contains(result, "FindUser(1)") {
+		t.Error("YAML entry should contain example code")
+	}
+}
+
+func Test_stripTagPrefix(t *testing.T) {
+	tests := []struct {
+		input  string
+		expect string
+	}{
+		{"[search] FindUser", "FindUser"},
+		{"[search, filter] SearchUtils - 通用搜索", "SearchUtils - 通用搜索"},
+		{"NoTags Here", "NoTags Here"},
+		{"[  ] EmptyTag", "EmptyTag"},
+	}
+
+	for _, tt := range tests {
+		got := stripTagPrefix(tt.input)
+		if got != tt.expect {
+			t.Errorf("stripTagPrefix(%q) = %q; want %q", tt.input, got, tt.expect)
+		}
+	}
+}
+
+func Test_formatMarkdownEntry(t *testing.T) {
+	result := formatMarkdownEntry("entry-1", "[search] FindUser", "search, user", "pkg/user.go", "2026-06-25", "查找用户", "user := FindUser(1)", []string{})
+
+	if !strings.Contains(result, "<!-- id: entry-1 -->") {
+		t.Error("Markdown entry should contain id comment")
+	}
+	if !strings.Contains(result, "## [search] FindUser") {
+		t.Error("Markdown entry should contain title heading")
+	}
+	if !strings.Contains(result, "**标签**: search, user") {
+		t.Error("Markdown entry should contain tags field")
+	}
+	if !strings.Contains(result, "FindUser(1)") {
+		t.Error("Markdown entry should contain example code")
+	}
+}
+
+func Test_escapeYAMLString(t *testing.T) {
+	tests := []struct {
+		input  string
+		expect string
+	}{
+		{"normal text", "normal text"},
+		{"has \"quotes\"", "has \\\"quotes\\\""},
+		{"multi\nline", "multi\\nline"},
+	}
+
+	for _, tt := range tests {
+		got := escapeYAMLString(tt.input)
+		if got != tt.expect {
+			t.Errorf("escapeYAMLString(%q) = %q; want %q", tt.input, got, tt.expect)
+		}
+	}
+}
+
+func Test_unescapeYAMLString(t *testing.T) {
+	tests := []struct {
+		input  string
+		expect string
+	}{
+		{"normal text", "normal text"},
+		{"has \\\"quotes\\\"", "has \"quotes\""},
+		{"multi\\nline", "multi\nline"},
+	}
+
+	for _, tt := range tests {
+		got := unescapeYAMLString(tt.input)
+		if got != tt.expect {
+			t.Errorf("unescapeYAMLString(%q) = %q; want %q", tt.input, got, tt.expect)
+		}
+	}
+}
+
+// -------- parseYAMLFields --------
+
+func Test_parseYAMLFields(t *testing.T) {
+	lines := []string{
+		"id: entry-1",
+		"title: \"[search] FindUser\"",
+		"tags: [search, user, filter]",
+		"source: \"pkg/search.go\"",
+		"updated: 2026-06-25",
+		"purpose: \"在列表中搜索\"",
+	}
+
+	entry := parseYAMLFields(lines)
+	if entry == nil {
+		t.Fatal("parseYAMLFields returned nil")
+	}
+
+	if entry.ID != "entry-1" {
+		t.Errorf("ID = %q; want %q", entry.ID, "entry-1")
+	}
+	if entry.Title != "[search] FindUser" {
+		t.Errorf("Title = %q; want %q", entry.Title, "[search] FindUser")
+	}
+	if len(entry.Tags) != 3 || entry.Tags[0] != "search" {
+		t.Errorf("Tags = %v; want [search user filter]", entry.Tags)
+	}
+	if entry.Source != "pkg/search.go" {
+		t.Errorf("Source = %q; want %q", entry.Source, "pkg/search.go")
+	}
+	if entry.UpdatedAt != "2026-06-25" {
+		t.Errorf("UpdatedAt = %q; want %q", entry.UpdatedAt, "2026-06-25")
+	}
+	if entry.Purpose != "在列表中搜索" {
+		t.Errorf("Purpose = %q; want %q", entry.Purpose, "在列表中搜索")
+	}
+}
+
+// -------- LintIssue --------
+
+func Test_LintIssue_DuplicateTitles(t *testing.T) {
+	// 模拟 lint 检查中的重复标题检测逻辑
+	entries := []Entry{
+		{Title: "FindUser", Tags: []string{"search"}, UpdatedAt: "2026-06-25", Purpose: "查找"},
+		{Title: "FindUser", Tags: []string{"search"}, UpdatedAt: "2026-06-26", Purpose: "查找2"},
+	}
+
+	titleCount := make(map[string]int)
+	for _, e := range entries {
+		titleCount[e.Title]++
+	}
+
+	dupCount := 0
+	for _, count := range titleCount {
+		if count > 1 {
+			dupCount++
+		}
+	}
+	if dupCount != 1 {
+		t.Errorf("expected 1 duplicate title, got %d", dupCount)
+	}
+}
+
+func Test_LintIssue_WeakTags(t *testing.T) {
+	entries := []Entry{
+		{Title: "NoTags", Tags: []string{}, UpdatedAt: "2026-06-25", Purpose: "desc"},
+		{Title: "OnlyGeneral", Tags: []string{"general"}, UpdatedAt: "2026-06-25", Purpose: "desc"},
+		{Title: "GoodTags", Tags: []string{"search", "filter"}, UpdatedAt: "2026-06-25", Purpose: "desc"},
+	}
+
+	weakCount := 0
+	for _, e := range entries {
+		if len(e.Tags) == 0 {
+			weakCount++
+		} else if len(e.Tags) == 1 && e.Tags[0] == "general" {
+			weakCount++
+		}
+	}
+	if weakCount != 2 {
+		t.Errorf("expected 2 weak tag entries, got %d", weakCount)
+	}
+}
+
+func Test_LintIssue_StaleEntries(t *testing.T) {
+	now := time.Now()
+	staleThreshold := 90 * 24 * time.Hour
+
+	entries := []Entry{
+		{Title: "Fresh", UpdatedAt: now.Format("2006-01-02")},
+		{Title: "Stale", UpdatedAt: now.Add(-180 * 24 * time.Hour).Format("2006-01-02")},
+		{Title: "NoDate", UpdatedAt: ""},
+	}
+
+	staleCount := 0
+	for _, e := range entries {
+		if e.UpdatedAt == "" {
+			staleCount++
+			continue
+		}
+		entryTime, err := time.Parse("2006-01-02", e.UpdatedAt)
+		if err != nil {
+			staleCount++
+			continue
+		}
+		if now.Sub(entryTime) > staleThreshold {
+			staleCount++
+		}
+	}
+	if staleCount != 2 {
+		t.Errorf("expected 2 stale/problematic entries, got %d", staleCount)
+	}
+}
+
+// -------- appendLog --------
+
+func Test_appendLog_CreateNew(t *testing.T) {
+	dir := t.TempDir()
+
+	appendLog(dir, "add", "TestFunc", "yaml")
+
+	logPath := filepath.Join(dir, logFile)
+	data, err := os.ReadFile(logPath)
+	if err != nil {
+		t.Fatalf("log.md should exist after appendLog: %v", err)
+	}
+
+	content := string(data)
+	if !strings.Contains(content, "# Knowledge Operation Log") {
+		t.Error("log.md should have header")
+	}
+	if !strings.Contains(content, "add") {
+		t.Error("log.md should contain 'add' action")
+	}
+	if !strings.Contains(content, "TestFunc") {
+		t.Error("log.md should contain entry title")
+	}
+	if !strings.Contains(content, "yaml") {
+		t.Error("log.md should contain format info")
+	}
+}
+
+func Test_appendLog_AppendExisting(t *testing.T) {
+	dir := t.TempDir()
+	// 先创建一个已有的 log.md
+	existing := "# Knowledge Operation Log\n\n> 操作日志\n\n| 时间 | 操作 | 详情 | 格式 |\n|------|------|------|------|\n| 2026-01-01 00:00:00 | init | 初始化 | all |\n"
+	if err := os.WriteFile(filepath.Join(dir, logFile), []byte(existing), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	appendLog(dir, "add", "NewFunc", "markdown")
+
+	data, err := os.ReadFile(filepath.Join(dir, logFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	content := string(data)
+	if !strings.Contains(content, "init") {
+		t.Error("existing log entries should be preserved")
+	}
+	if !strings.Contains(content, "NewFunc") {
+		t.Error("new entry should be appended")
+	}
+}
+
+// -------- Related 字段 --------
+
+func Test_Entry_RelatedField(t *testing.T) {
+	e := Entry{Title: "Test", Related: []string{"A", "B"}}
+	if len(e.Related) != 2 || e.Related[0] != "A" {
+		t.Errorf("Entry.Related = %v; want [A, B]", e.Related)
+	}
+}
+
+func Test_Entry_RelatedDefaultEmpty(t *testing.T) {
+	e := Entry{Title: "Test"}
+	if len(e.Related) != 0 {
+		t.Errorf("Entry.Related should default to empty, got %v", e.Related)
+	}
+}
+
+func Test_parseEntries_YAMLWithRelated(t *testing.T) {
+	content := `---
+id: entry-1
+title: "SearchUtils - 搜索"
+tags: [search, filter]
+related: [FilterUtils - 过滤, SortUtils - 排序]
+source: "pkg/search.go"
+updated: 2026-06-25
+purpose: "搜索列表"
+---
+
+` + "```go" + `
+result := SearchUtils.Find(items)
+` + "```" + `
+
+---
+`
+	dir := t.TempDir()
+	p := filepath.Join(dir, "test.md")
+	if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	entries, err := parseEntries(p)
+	if err != nil {
+		t.Fatalf("parseEntries() error = %v", err)
+	}
+
+	if len(entries) != 1 {
+		t.Fatalf("got %d entries; want 1", len(entries))
+	}
+
+	e := entries[0]
+	if len(e.Related) != 2 {
+		t.Errorf("Related = %v; want 2 items", e.Related)
+	}
+	if e.Related[0] != "FilterUtils - 过滤" {
+		t.Errorf("Related[0] = %q; want %q", e.Related[0], "FilterUtils - 过滤")
+	}
+}
+
+func Test_parseEntries_MarkdownWithRelated(t *testing.T) {
+	content := `<!-- id: entry-1 -->
+## [search] SearchUtils - 搜索
+
+**标签**: search
+**来源**: pkg/search.go
+**更新**: 2026-06-25
+**用途**: 搜索列表
+**关联**: FilterUtils - 过滤, SortUtils - 排序
+
+---
+`
+	dir := t.TempDir()
+	p := filepath.Join(dir, "test.md")
+	if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	entries, err := parseEntries(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(entries) != 1 {
+		t.Fatalf("got %d entries; want 1", len(entries))
+	}
+
+	e := entries[0]
+	if len(e.Related) != 2 {
+		t.Errorf("Related = %v; want 2 items", e.Related)
+	}
+	if e.Related[0] != "FilterUtils - 过滤" {
+		t.Errorf("Related[0] = %q; want %q", e.Related[0], "FilterUtils - 过滤")
+	}
+}
+
+func Test_formatYAMLEntry_WithRelated(t *testing.T) {
+	result := formatYAMLEntry("entry-1", "Search", []string{"search"}, "pkg/s.go", "2026-06-25", "搜索", "", []string{"Filter - 过滤"})
+	if !strings.Contains(result, "related: [Filter - 过滤]") {
+		t.Errorf("YAML entry should contain related field, got:\n%s", result)
+	}
+}
+
+func Test_formatYAMLEntry_NoRelated(t *testing.T) {
+	result := formatYAMLEntry("entry-1", "Search", []string{"search"}, "pkg/s.go", "2026-06-25", "搜索", "", []string{})
+	if strings.Contains(result, "related:") {
+		t.Errorf("YAML entry should NOT contain related field when empty, got:\n%s", result)
+	}
+}
+
+func Test_formatMarkdownEntry_WithRelated(t *testing.T) {
+	result := formatMarkdownEntry("entry-1", "Search", "search", "pkg/s.go", "2026-06-25", "搜索", "", []string{"Filter"})
+	if !strings.Contains(result, "**关联**: Filter") {
+		t.Errorf("Markdown entry should contain related field, got:\n%s", result)
+	}
+}
+
+func Test_formatMarkdownEntry_NoRelated(t *testing.T) {
+	result := formatMarkdownEntry("entry-1", "Search", "search", "pkg/s.go", "2026-06-25", "搜索", "", []string{})
+	if strings.Contains(result, "**关联**") {
+		t.Errorf("Markdown entry should NOT contain related field when empty, got:\n%s", result)
+	}
+}
+
+func Test_discoverTagRelations(t *testing.T) {
+	entries := []Entry{
+		{Title: "SearchA", Tags: []string{"search", "filter", "list"}},
+		{Title: "SearchB", Tags: []string{"search", "filter", "sort"}},
+		{Title: "Unrelated", Tags: []string{"auth", "user"}},
+	}
+
+	relations := discoverTagRelations(entries, 2)
+	if len(relations) == 0 {
+		t.Error("expected tag relations to be discovered")
+	}
+	foundB := false
+	for _, r := range relations["SearchA"] {
+		if r == "SearchB" {
+			foundB = true
+		}
+	}
+	if !foundB {
+		t.Error("SearchA should be related to SearchB via shared tags")
+	}
+}
+
+func Test_discoverTagRelations_NoMatch(t *testing.T) {
+	entries := []Entry{
+		{Title: "Search", Tags: []string{"search"}},
+		{Title: "Auth", Tags: []string{"auth"}},
+	}
+
+	relations := discoverTagRelations(entries, 2)
+	if len(relations) != 0 {
+		t.Errorf("expected no relations, got %v", relations)
+	}
+}
